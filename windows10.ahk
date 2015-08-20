@@ -105,3 +105,4 @@ getCurrentDesktopNumber(leaveWinTabOpen := true)
 	}
 	return currentDesktopNumber
 }
+#Include contextMenu.ahk
