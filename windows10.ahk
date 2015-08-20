@@ -6,6 +6,10 @@
 #4::
 #5::
 #6::
+#7::
+#8::
+#9::
+#0::
 {
 	StringTrimLeft, count, A_ThisHotkey, 1
 	moveToDesktop(count)
@@ -17,6 +21,10 @@
 4::
 5::
 6::
+7::
+8::
+9::
+0::
 {
 	moveToDesktop(A_ThisHotkey)
 	return
@@ -32,6 +40,10 @@
 +#4::
 +#5::
 +#6::
++#7::
++#8::
++#9::
++#0::
 {
 	StringTrimLeft, newDesktopNumber, A_ThisHotkey, 2
 	moveActiveWindowToDesktop(newDesktopNumber)
@@ -55,7 +67,7 @@ moveActiveWindowToDesktop(newDesktopNumber)
 	}
 	;desktop starts at 1 so decrement the new desktopNumber by 1
 	newDesktopNumber--
-	if(currentDesktopNumber < newDesktopNumber)
+	if(currentDesktopNumber <= newDesktopNumber)
 	{
 		newDesktopNumber--
 	}
