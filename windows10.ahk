@@ -1,3 +1,9 @@
+if not A_IsAdmin
+{
+   Run *RunAs "%A_ScriptFullPath%"  ; Requires v1.0.92.01+
+   ExitApp
+}
+
 #IfWinActive ahk_class MultitaskingViewFrame
 ;Pressing windows + tab puts you in the MultitaskingViewFrame. Press windows key + a number will switch to that desktop
 #1::
