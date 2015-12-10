@@ -26,5 +26,5 @@ getMenuString(menuHwnd, Delimiter := ",", subDelimiter := "`n")
       If (idn = -1) && (hSubMenu := DllCall("GetSubMenu", "Uint", menuHwnd, "int", idx))
          sContents .= getMenuString(hSubMenu, Delimiter)
    }
-   Return   sContents
+   return   sContents
 }
