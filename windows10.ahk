@@ -51,6 +51,8 @@ if not A_IsAdmin
 +#9::
 +#0::
 {
+	;setting this to true will make you follow the active window to its new desktop
+	follow := false
 	StringTrimLeft, newDesktopNumber, A_ThisHotkey, 2
 	moveActiveWindowToDesktop(newDesktopNumber)
 	return	
@@ -64,8 +66,9 @@ moveToDesktop(desktopNumber)
 	return
 }
 
-moveActiveWindowToDesktop(newDesktopNumber)
+moveActiveWindowToDesktop(newDesktopNumber, follow)
 {
+	desktopNumber := newDesktopNumber
 	currentDesktopNumber := getCurrentDesktopNumber()
 	if(currentDesktopNumber == newDesktopNumber)
 	{
@@ -77,7 +80,14 @@ moveActiveWindowToDesktop(newDesktopNumber)
 	{
 		newDesktopNumber--
 	}
-	send m{down %newDesktopNumber%}{enter}
+	send m{down %newDesktopNumber%}{return}
+	
+	if(follow == true) 
+	{
+		send #{tab}
+		WinWait, ahk_class MultitaskingViewFrame
+		moveToDesktop(desktopNumber)
+	}
 	return	
 }
 
