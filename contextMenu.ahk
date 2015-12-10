@@ -1,6 +1,10 @@
 getContextMenuHwnd()
 {
    WinWait, ahk_class #32768, , 2
+   if ErrorLevel
+   {
+      MsgBox, Error waiting for context menu
+   }
    SendMessage, 0x1E1, 0, 0
    menuHwnd := ErrorLevel
    return menuHwnd
