@@ -4,8 +4,8 @@ if not A_IsAdmin
    ExitApp
 }
 
-#IfWinActive ahk_class MultitaskingViewFrame
-;Pressing windows + tab puts you in the MultitaskingViewFrame. Press windows key + a number will switch to that desktop
+
+;Press windows key + a number will switch to that desktop
 #1::
 #2::
 #3::
@@ -18,9 +18,13 @@ if not A_IsAdmin
 #0::
 {
 	StringTrimLeft, count, A_ThisHotkey, 1
+	send #{tab}
+	WinWait, ahk_class MultitaskingViewFrame
 	moveToDesktop(count)
 	return
 }
+#IfWinActive ahk_class MultitaskingViewFrame
+;Pressing windows + tab puts you in the MultitaskingViewFrame. Then pressing a number will switch to that desktop
 1::
 2::
 3::
