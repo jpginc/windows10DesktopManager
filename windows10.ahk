@@ -73,6 +73,10 @@ moveToDesktop(desktopNumber)
 moveActiveWindowToDesktop(newDesktopNumber, follow)
 {
 	desktopNumber := newDesktopNumber
+	
+	monitorNumber := getCurrentMonitor()
+	SysGet, primaryMonitor, MonitorPrimary
+	
 	currentDesktopNumber := getCurrentDesktopNumber()
 	if(currentDesktopNumber == newDesktopNumber)
 	{
@@ -84,6 +88,12 @@ moveActiveWindowToDesktop(newDesktopNumber, follow)
 	{
 		newDesktopNumber--
 	}
+	
+	if(monitorNumber <> primaryMonitor)
+	{
+		send {Esc}{tab 2}{AppsKey}
+	}
+	
 	send m{down %newDesktopNumber%}{return}
 	
 	if(follow == true) 
@@ -125,4 +135,19 @@ getCurrentDesktopNumber(leaveWinTabOpen := true)
 	}
 	return currentDesktopNumber
 }
+
+GetCurrentMonitor() {
+	SysGet, numberOfMonitors, MonitorCount
+	WinGetPos, winX, winY, winWidth, winHeight, A
+	winMidX := winX + winWidth / 2
+	winMidY := winY + winHeight / 2
+	Loop %numberOfMonitors%
+	{
+	SysGet, monArea, Monitor, %A_Index%
+	if (winMidX > monAreaLeft && winMidX < monAreaRight && winMidY < monAreaBottom && winMidY > monAreaTop)
+		return %A_Index%
+	}
+	return
+}
+
 #Include contextMenu.ahk
