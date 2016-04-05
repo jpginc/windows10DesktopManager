@@ -1,6 +1,7 @@
 getContextMenuHwnd()
 {
    WinWait, ahk_class #32768, , 2
+   if ErrorLevel
    {
       MsgBox, Error waiting for context menu
    }
@@ -29,5 +30,5 @@ getMenuString(menuHwnd, Delimiter := ",", subDelimiter := "`n")
       If (idn = -1) && (hSubMenu := DllCall("GetSubMenu", "Uint", menuHwnd, "int", idx))
          sContents .= getMenuString(hSubMenu, Delimiter)
    }
-   Return   sContents
+   return   sContents
 }
