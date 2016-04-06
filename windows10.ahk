@@ -5,7 +5,8 @@ if not A_IsAdmin
    ExitApp
 }
 
-
+globalDesktopManager := new JPGIncDesktopManager()
+return
 ;Press windows key + a number will switch to that desktop
 #1::
 #2::
@@ -16,14 +17,12 @@ if not A_IsAdmin
 #7::
 #8::
 #9::
-#0::
 {
-	StringTrimLeft, count, A_ThisHotkey, 1
-	send #{tab}
-	WinWait, ahk_class MultitaskingViewFrame
-	moveToDesktop(count)
+	StringTrimLeft, newDekstopNumber, A_ThisHotkey, 1
+	globalDesktopManager.moveToDesktop(newDekstopNumber)
 	return
 }
+#0::globalDesktopManager.moveToDesktop(10)
 #IfWinActive ahk_class MultitaskingViewFrame
 ;Pressing windows + tab puts you in the MultitaskingViewFrame. Then pressing a number will switch to that desktop
 1::
@@ -37,7 +36,7 @@ if not A_IsAdmin
 9::
 0::
 {
-	moveToDesktop(A_ThisHotkey)
+	globalDesktopManager.moveToDesktop(A_ThisHotkey == 0 ? 0 : 10)
 	return
 }
 
@@ -57,9 +56,8 @@ if not A_IsAdmin
 +#0::
 {
 	;setting this to true will make you follow the active window to its new desktop
-	follow := false
 	StringTrimLeft, newDesktopNumber, A_ThisHotkey, 2
-	moveActiveWindowToDesktop(newDesktopNumber)
+	globalDesktopManager.moveActiveWindowToDesktop(newDesktopNumber)
 	return	
 }
 
