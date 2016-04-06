@@ -51,25 +51,61 @@ moveActiveWindowToDesktop(newDesktopNumber, follow := false)
  */
 getCurrentDesktopNumber(leaveWinTabOpen := true)
 {
-	currentDesktopNumber := 0
-	send #{tab}
-	winwait, ahk_class MultitaskingViewFrame
-	send {Appskey}
-	menuString := getMenuString(getContextMenuHwnd())
+	currentDesktopId := getCurrentDesktopId()
+	allDesktopIds := getAllDesktopIds()
+	; Get the current desktop UUID. Length should be 32 always, but there's no guarantee this couldn't change in a later Windows release so we check.
 
-	while(instr(menuString, "Desktop"))
+	allDesktopIds := splitStringByCharCount(StrLen(currentDesktopId), allDesktopIds)
+	currentDesktopNumber := getIndexFromArray(currentDesktopId, allDesktopIds)
+	
+	return currentDesktopNumber
+}
+getIndexFromArray(searchFor, array) 
+{
+	loop, % array.MaxIndex()
 	{
-		if(! regexMatch(menuString, ",Desktop " A_index ","))
+		MsgBox % array[A_index] " "  searchFor
+		if(array[A_index] == searchFor) 
 		{
-			currentDesktopNumber := A_Index
+			return A_index
+		}
+	}
+	return false
+}
+getAllDesktopIds()
+{
+	; Get a list of the UUIDs for all virtual desktops on the system
+    RegRead, allDesktopIds, HKEY_CURRENT_USER, SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VirtualDesktops, VirtualDesktopIDs
+	return allDesktopIds	
+}
+getCurrentDesktopId() 
+{
+	; RegRead strategy from optimist__prime and pmb6tz https://autohotkey.com/boards/viewtopic.php?t=9224
+	currentDesktopId := false
+	infoNumber := 0
+	
+	while (! currentDesktopId)
+    {         
+         RegRead, currentDesktopId, HKEY_CURRENT_USER, SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\SessionInfo\%infoNumber%\VirtualDesktops, CurrentVirtualDesktop
+         infoNumber++
+    }
+	
+	return currentDesktopId
+}
+
+splitStringByCharCount(count, string) {
+	splitString := []
+	currentIndex := 1
+	loop
+	{
+		splitString.Insert(SubStr(string, currentIndex, count))
+		
+		currentIndex += count
+		if(currentIndex >= StrLen(string)) {
 			break
 		}
 	}
-	if(!leaveWinTabOpen)
-	{
-		send #{tab}
-	}
-	return currentDesktopNumber
+	return splitString
 }
 
 GetCurrentMonitor() {
