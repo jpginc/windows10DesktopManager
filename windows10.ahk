@@ -54,7 +54,7 @@ return
 {
 	;setting this to true will make you follow the active window to its new desktop
 	StringTrimLeft, newDesktopNumber, A_ThisHotkey, 2
-	globalDesktopManager.moveActiveWindowToDesktop(newDesktopNumber)
+	globalDesktopManager.moveActiveWindowToDesktop(newDesktopNumber, follow := false)
 	return	
 }
 

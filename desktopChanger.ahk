@@ -32,14 +32,12 @@ class JPGIncDesktopManager
 
 		active := "ahk_id " WinExist("A")
 		WinHide, % active
-		
 		this.moveToDesktop(newDesktopNumber)
-		
 		WinShow, % active
-		WinWaitActive, % active
 		
 		if(! follow) 
 		{
+			WinActivate, % active
 			this.moveToDesktop(currentDesktopNumber)
 		}
 
