@@ -6,7 +6,7 @@ moveToDesktop(desktopNumber)
 	return
 }
 
-moveActiveWindowToDesktop(newDesktopNumber, follow)
+moveActiveWindowToDesktop(newDesktopNumber, follow := false)
 {
 	desktopNumber := newDesktopNumber
 	
