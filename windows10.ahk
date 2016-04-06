@@ -1,12 +1,11 @@
 #SingleInstance
-if not A_IsAdmin
-{
-   Run *RunAs "%A_ScriptFullPath%"  ; Requires v1.0.92.01+
-   ExitApp
-}
 
 globalDesktopManager := new JPGIncDesktopManager()
 return
+#c::ExitApp
+
+#0::globalDesktopManager.moveToDesktop(10)
+#IfWinActive ahk_class MultitaskingViewFrame
 ;Press windows key + a number will switch to that desktop
 #1::
 #2::
@@ -19,11 +18,9 @@ return
 #9::
 {
 	StringTrimLeft, newDekstopNumber, A_ThisHotkey, 1
-	globalDesktopManager.moveToDesktop(newDekstopNumber)
+	globalDesktopManager.moveToDesktop(newDekstopNumber, true)
 	return
 }
-#0::globalDesktopManager.moveToDesktop(10)
-#IfWinActive ahk_class MultitaskingViewFrame
 ;Pressing windows + tab puts you in the MultitaskingViewFrame. Then pressing a number will switch to that desktop
 1::
 2::
@@ -36,7 +33,7 @@ return
 9::
 0::
 {
-	globalDesktopManager.moveToDesktop(A_ThisHotkey == 0 ? 0 : 10)
+	globalDesktopManager.moveToDesktop(A_ThisHotkey == 0 ? 10 : A_ThisHotkey, true)
 	return
 }
 

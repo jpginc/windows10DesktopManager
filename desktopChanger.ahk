@@ -6,66 +6,68 @@ class JPGIncDesktopManager
 	moveToDesktop(newDesktopNumber) 
 	{
 		distanceToMove := newDesktopNumber - this.getCurrentDesktopNumber()
-		loop % abs(distanceToMove)
+		absDistance := Abs(distanceToMove)
+		if(distanceToMove < 0) 
 		{
-			if(distanceToMove < 0) 
-			{
-				send ^#{Left}
-			} else 
-			{
-				send ^#{Right}
-			}
+			send ^#{Left %absDistance%}
+		} else 
+		{
+			send ^#{Right %absDistance%}
+		}
+				
+		IfWinActive, ahk_class MultitaskingViewFrame
+		{
+			send, #{tab}
 		}
 		return
 	}	
 	
-	moveActiveWindowToDesktop(newDesktopNumber, follow := false)
+	moveActiveWindowToDesktop(newDesktopNumber, follow := true)
 	{
 		currentDesktopNumber := this.getCurrentDesktopNumber()
 		if(currentDesktopNumber == newDesktopNumber)
 		{
 			return
 		}
-		
-		monitorNumber := getCurrentMonitor()
-		SysGet, primaryMonitor, MonitorPrimary
-		
+
 		active := "ahk_id " WinExist("A")
 		WinHide, % active
 		
 		this.moveToDesktop(newDesktopNumber)
 		
 		WinShow, % active
+		WinWaitActive, % active
 		
 		if(! follow) 
 		{
 			this.moveToDesktop(currentDesktopNumber)
 		}
+
 		return	
 	}
 	
 	getCurrentDesktopNumber()
 	{
-	currentDesktopId := this.getCurrentDesktopId()
-	allDesktopIds := this.getAllDesktopIds()
-	; Get the current desktop UUID. Length should be 32 always, but there's no guarantee this couldn't change in a later Windows release so we check.
+		currentDesktopId := this.getCurrentDesktopId()
+		allDesktopIds := this.getAllDesktopIds()
+		; Get the current desktop UUID. Length should be 32 always, but there's no guarantee this couldn't change in a later Windows release so we check.
 
-	allDesktopIds := this.splitStringByCharCount(StrLen(currentDesktopId), allDesktopIds)
-	currentDesktopNumber := this.getIndexFromArray(currentDesktopId, allDesktopIds)
+		allDesktopIds := this.splitStringByCharCount(StrLen(currentDesktopId), allDesktopIds)
+		currentDesktopNumber := this.getIndexFromArray(currentDesktopId, allDesktopIds)
 
-	return currentDesktopNumber
+		return currentDesktopNumber
 	}
 	
 	getIndexFromArray(searchFor, array) 
 	{
-	loop, % array.MaxIndex()
-	{
-		if(array[A_index] == searchFor) 
+		loop, % array.MaxIndex()
 		{
-			return A_index
+			if(array[A_index] == searchFor) 
+			{
+				return A_index
+			}
 		}
-	}
-	return false
+		return false
 	}
 	
 	getAllDesktopIds()
@@ -105,18 +107,4 @@ class JPGIncDesktopManager
 		}
 		return splitString
 	}
-}
-
-GetCurrentMonitor() {
-	SysGet, numberOfMonitors, MonitorCount
-	WinGetPos, winX, winY, winWidth, winHeight, A
-	winMidX := winX + winWidth / 2
-	winMidY := winY + winHeight / 2
-	Loop %numberOfMonitors%
-	{
-	SysGet, monArea, Monitor, %A_Index%
-	if (winMidX > monAreaLeft && winMidX < monAreaRight && winMidY < monAreaBottom && winMidY > monAreaTop)
-		return %A_Index%
-	}
-	return
 }
