@@ -1,5 +1,32 @@
+JPGIncDesktopManagerMoveCallback()
+{
+	desktopNumber := SubStr(A_ThisHotkey, 0)
+	JPGIncDesktopManager.moveActiveWindowToDesktop(desktopNumber == 0 ? 10 : desktopNumber)
+	return
+}
+JPGIncDesktopManagerChangeCallback()
+{
+	desktopNumber := SubStr(A_ThisHotkey, 0)
+	JPGIncDesktopManager.moveToDesktop(desktopNumber == 0 ? 10 : desktopNumber)
+	return
+}
 class JPGIncDesktopManager 
 {
+	__new(options) 
+	{
+		moveFunction := this.moveToDesktop
+		loop, 10
+		{
+			moveCallback := Func("JPGIncDesktopManagerMoveCallback").Bind()
+			changeCallback := Func("JPGIncDesktopManagerChangeCallback").Bind()
+			Hotkey, If
+			Hotkey, % options.modKey options.moveWindowModKey (A_index -1), % moveCallback
+			Hotkey, % options.modKey (A_index -1), % changeCallback
+			Hotkey, IfWinActive, ahk_class MultitaskingViewFrame
+			Hotkey, % (A_index -1), % changeCallback
+		}
+		return this
+	}
 	/*
 	 *	swap to the given virtual desktop number
 	 */
@@ -22,7 +49,7 @@ class JPGIncDesktopManager
 		return
 	}	
 	
-	moveActiveWindowToDesktop(newDesktopNumber, follow := true)
+	moveActiveWindowToDesktop(newDesktopNumber, follow := false)
 	{
 		currentDesktopNumber := this.getCurrentDesktopNumber()
 		if(currentDesktopNumber == newDesktopNumber)
@@ -79,13 +106,13 @@ class JPGIncDesktopManager
 	{
 		; RegRead strategy from optimist__prime and pmb6tz https://autohotkey.com/boards/viewtopic.php?t=9224
 		currentDesktopId := false
-		infoNumber := 0
+		infoNumber := 1
 
 		while (! currentDesktopId)
 		{         
 			 RegRead, currentDesktopId, HKEY_CURRENT_USER, SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\SessionInfo\%infoNumber%\VirtualDesktops, CurrentVirtualDesktop
 			 infoNumber++
-	}
+		}
 
 		return currentDesktopId
 	}
