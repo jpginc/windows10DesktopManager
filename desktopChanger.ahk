@@ -1,29 +1,50 @@
-JPGIncDesktopManagerMoveCallback()
+JPGIncDesktopManagerCallback(desktopManager, functionName, keyPressed)
 {
-	desktopNumber := SubStr(A_ThisHotkey, 0)
-	JPGIncDesktopManager.moveActiveWindowToDesktop(desktopNumber == 0 ? 10 : desktopNumber)
+	desktopManager[functionName](keyPressed)
 	return
 }
-JPGIncDesktopManagerChangeCallback()
-{
-	desktopNumber := SubStr(A_ThisHotkey, 0)
-	JPGIncDesktopManager.moveToDesktop(desktopNumber == 0 ? 10 : desktopNumber)
-	return
-}
+
 class JPGIncDesktopManager 
 {
+	moveWinMod := "moveWindowModKey"
+	changeVDMod := "changeDesktopModKey"
+	notAnAutohotkeyModKeyRegex := "[^#!^+<>*~$]"
 	__new(options) 
 	{
-		moveFunction := this.moveToDesktop
+		this.options := options
+		this.mapHotkeys()
+		
+		return this
+	}
+	
+	mapHotkeys()
+	{
+		this.fixModKeysForHotkeySyntax()
 		loop, 10
 		{
-			moveCallback := Func("JPGIncDesktopManagerMoveCallback").Bind()
-			changeCallback := Func("JPGIncDesktopManagerChangeCallback").Bind()
+			moveCallback := Func("JPGIncDesktopManagerCallback").Bind(this, "moveActiveWindowToDesktop", A_Index - 1)
+			changeCallback := Func("JPGIncDesktopManagerCallback").Bind(this, "moveToDesktop", A_Index -1)
 			Hotkey, If
-			Hotkey, % options.modKey options.moveWindowModKey (A_index -1), % moveCallback
-			Hotkey, % options.modKey (A_index -1), % changeCallback
+			Hotkey, % this.options[this.moveWinMod] (A_index -1), % moveCallback
+			Hotkey, % this.options[this.changeVDMod] (A_index -1), % changeCallback
 			Hotkey, IfWinActive, ahk_class MultitaskingViewFrame
-			Hotkey, % (A_index -1), % changeCallback
+			Hotkey, % "*" (A_index -1), % changeCallback ;if the user has already pressed win + tab then numbers quicly change desktops
+		}
+		return this
+	}
+	
+	/*
+	 * If the modifier key used is only a modifier symbol then we don't need to do anything (https://autohotkey.com/docs/Hotkeys.htm#Symbols)
+	 * but if it contains any other characters then it means that the hotkey is a combination hotkey then we need to add " & " 
+	 */
+	fixModKeysForHotkeySyntax() 
+	{
+		if(RegExMatch(this.options[this.moveWinMod], this.notAnAutohotkeyModKeyRegex)) {
+			this.options[this.moveWinMod] += " & "
+		}
+		
+		if(RegExMatch(this.options[this.changeVDMod], this.notAnAutohotkeyModKeyRegex)) {
+			this.options[this.changeVDMod] += " & "
 		}
 		return this
 	}
@@ -46,8 +67,22 @@ class JPGIncDesktopManager
 		{
 			send, #{tab}
 		}
+		this.doPostMoveDesktop()
+		
 		return
 	}	
+	doPostMoveDesktop() 
+	{
+		if(IsFunc(this.options.postChangeDesktop)) 
+		{
+			f := this.options.postChangeDesktop
+			%f%()
+		} else if(IsObject(this.options.postChangeDesktop))
+		{
+			this.options.postChangeDesktop()
+		}
+		return this
+	}
 	
 	moveActiveWindowToDesktop(newDesktopNumber, follow := false)
 	{
@@ -112,6 +147,12 @@ class JPGIncDesktopManager
 		{         
 			 RegRead, currentDesktopId, HKEY_CURRENT_USER, SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\SessionInfo\%infoNumber%\VirtualDesktops, CurrentVirtualDesktop
 			 infoNumber++
+			if (InfoNumber = 10) ;if the user has never changed virtual desktops then there may not be a reg entry. changing desktops will create it 
+			{
+				Send ^#{Right}
+				Send ^#{Left} 
+				InfoNumber = 1
+			}
 		}
 
 		return currentDesktopId
