@@ -9,6 +9,7 @@ class JPGIncDesktopManager
 	moveWinMod := "moveWindowModKey"
 	changeVDMod := "changeDesktopModKey"
 	notAnAutohotkeyModKeyRegex := "[^#!^+<>*~$]"
+	
 	__new(options) 
 	{
 		this.options := options
@@ -53,6 +54,13 @@ class JPGIncDesktopManager
 	 */
 	moveToDesktop(newDesktopNumber) 
 	{
+		this._moveToDesktop(newDesktopNumber)
+			.doPostMoveDesktop()
+		return this
+	}	
+	
+	_moveToDesktop(newDesktopNumber)
+	{
 		distanceToMove := newDesktopNumber - this.getCurrentDesktopNumber()
 		absDistance := Abs(distanceToMove)
 		if(distanceToMove < 0) 
@@ -67,19 +75,29 @@ class JPGIncDesktopManager
 		{
 			send, #{tab}
 		}
-		this.doPostMoveDesktop()
-		
-		return
-	}	
+		return this
+	}
+	
 	doPostMoveDesktop() 
 	{
-		if(IsFunc(this.options.postChangeDesktop)) 
+		this._callFunction(this.options.postChangeDesktop)
+		return this
+	}
+	
+	doPostMoveWindow() 
+	{
+		this._callFunction(this.options.postMoveWindow)
+		return this
+	}
+	
+	_callFunction(possibleFunction)
+	{
+		if(IsFunc(possibleFunction)) 
 		{
-			f := this.options.postChangeDesktop
-			%f%()
-		} else if(IsObject(this.options.postChangeDesktop))
+			%possibleFunction%()
+		} else if(IsObject(possibleFunction))
 		{
-			this.options.postChangeDesktop()
+			possibleFunction.Call()
 		}
 		return this
 	}
@@ -89,7 +107,7 @@ class JPGIncDesktopManager
 		currentDesktopNumber := this.getCurrentDesktopNumber()
 		if(currentDesktopNumber == newDesktopNumber)
 		{
-			return
+			return this
 		}
 
 		active := "ahk_id " WinExist("A")
@@ -100,10 +118,12 @@ class JPGIncDesktopManager
 		if(! follow) 
 		{
 			WinActivate, % active
-			this.moveToDesktop(currentDesktopNumber)
+			this._moveToDesktop(currentDesktopNumber)
 		}
+		
+		this.doPostMoveWindow()
 
-		return	
+		return	this
 	}
 	
 	getCurrentDesktopNumber()

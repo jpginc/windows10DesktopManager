@@ -6,7 +6,7 @@ afterDesktopChangeTurnOffCapslock()
 }
 options := { "changeDesktopModKey": "Capslock"
 	,"moveWindowModKey" : "+#"
-	,"postChangeDesktop" : "afterDesktopChangeTurnOffCapslock"}
+	,"postChangeDesktop" : Func("afterDesktopChangeTurnOffCapslock").bind()}
 	
 ;~ options := {"changeDesktopModKey": "#", "moveWindowModKey" : "+#"}
 globalDesktopManager := new JPGIncDesktopManager(options)
