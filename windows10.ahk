@@ -4,8 +4,7 @@ afterDesktopChangeTurnOffCapslock()
 	SetCapsLockState , Off
 	return
 }
-options := { "changeDesktopModKey": "Capslock"
-	,"moveWindowModKey" : "+#"
+options := {"moveWindowModKey" : "Capslock"
 	,"postChangeDesktop" : Func("afterDesktopChangeTurnOffCapslock").bind()}
 	
 ;~ options := {"changeDesktopModKey": "#", "moveWindowModKey" : "+#"}

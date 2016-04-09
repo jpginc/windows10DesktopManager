@@ -13,6 +13,7 @@ class JPGIncDesktopManager
 	__new(options) 
 	{
 		this.options := options
+
 		this.mapHotkeys()
 		
 		return this
@@ -48,11 +49,11 @@ class JPGIncDesktopManager
 	fixModKeysForHotkeySyntax() 
 	{
 		if(RegExMatch(this.options[this.moveWinMod], this.notAnAutohotkeyModKeyRegex)) {
-			this.options[this.moveWinMod] += " & "
+			this.options[this.moveWinMod] .= " & "
 		}
 		
 		if(RegExMatch(this.options[this.changeVDMod], this.notAnAutohotkeyModKeyRegex)) {
-			this.options[this.changeVDMod] += " & "
+			this.options[this.changeVDMod] .= " & "
 		}
 		return this
 	}
