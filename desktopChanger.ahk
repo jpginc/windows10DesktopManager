@@ -26,8 +26,15 @@ class JPGIncDesktopManager
 			moveCallback := Func("JPGIncDesktopManagerCallback").Bind(this, "moveActiveWindowToDesktop", A_Index - 1)
 			changeCallback := Func("JPGIncDesktopManagerCallback").Bind(this, "moveToDesktop", A_Index -1)
 			Hotkey, If
-			Hotkey, % this.options[this.moveWinMod] (A_index -1), % moveCallback
-			Hotkey, % this.options[this.changeVDMod] (A_index -1), % changeCallback
+			if(this.options[this.moveWinMod]) 
+			{
+				Hotkey, % this.options[this.moveWinMod] (A_index -1), % moveCallback
+			}
+			if(this.options[this.changeVDMod]) 
+			{
+				Hotkey, % this.options[this.changeVDMod] (A_index -1), % changeCallback
+			}
+			
 			Hotkey, IfWinActive, ahk_class MultitaskingViewFrame
 			Hotkey, % "*" (A_index -1), % changeCallback ;if the user has already pressed win + tab then numbers quicly change desktops
 		}
