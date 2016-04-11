@@ -69,15 +69,10 @@ class JPGIncDesktopManager
 	
 	_moveToDesktop(newDesktopNumber)
 	{
-		distanceToMove := newDesktopNumber - this.getCurrentDesktopNumber()
-		absDistance := Abs(distanceToMove)
-		if(distanceToMove < 0) 
-		{
-			send ^#{Left %absDistance%}
-		} else 
-		{
-			send ^#{Right %absDistance%}
-		}
+		;just move all the way to the start and the move right
+		newDesktopNumber--
+		send ^#{Left 10}
+		send ^#{Right %newDesktopNumber%}
 				
 		IfWinActive, ahk_class MultitaskingViewFrame
 		{
