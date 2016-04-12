@@ -7,18 +7,11 @@ class DesktopMapperClass
 	moveWindowToDesktop  := ""
 	iVirtualDesktopManager := ""
 	
-	__new()
+	__new(iVirtualDesktopManager, isWindowOnCurrentVirtualDesktopAddress, getWindowDesktopIdAddress)
 	{
-		;IVirtualDesktopManager interface
-		;Exposes methods that enable an application to interact with groups of windows that form virtual workspaces.
-		;https://msdn.microsoft.com/en-us/library/windows/desktop/mt186440(v=vs.85).aspx
-		CLSID := "{aa509086-5ca9-4c25-8f95-589d3c07b48a}" ;search VirtualDesktopManager clsid
-		IID := "{a5cd92ff-29be-454c-8d04-d82879fb3f1b}" ;search IID_IVirtualDesktopManager
-		this.iVirtualDesktopManager := ComObjCreate(CLSID, IID)
-		
-		this.isWindowOnCurrentVirtualDesktopAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 3*A_PtrSize)
-		this.getWindowDesktopIdAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 4*A_PtrSize)
-		this.moveWindowToDesktopAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 5*A_PtrSize)
+		this.iVirtualDesktopManager := iVirtualDesktopManager
+		this.isWindowOnCurrentVirtualDesktopAddress := isWindowOnCurrentVirtualDesktopAddress
+		this.getWindowDesktopIdAddress := getWindowDesktopIdAddress
 
 		return this
 	}
@@ -33,6 +26,18 @@ class DesktopMapperClass
 		this._returnToDesktop(currentDesktop)
 		;~ debugger("markers created")
 		return this
+	}
+	
+	getGuidOfDesktop(desktopNumber)
+	{
+		;~ this._verifyDesktopMapping()
+		return this.DesktopMarkers[desktopNumber]
+	}
+	
+	getHwndOfDesktop(desktopNumber)
+	{
+		;~ this._verifyDesktopMapping()
+		return this.DesktopMarkers[desktopNumber].hwnd
 	}
 	
 	/*
