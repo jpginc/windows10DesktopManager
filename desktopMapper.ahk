@@ -1,6 +1,6 @@
-class DesktopMapper
+class DesktopMapperClass
 {
-	desktopMarkers := Object()
+	DesktopMarkerClass := Object()
 	
 	getWindowDesktopIdAddress := ""
 	isWindowOnCurrentVirtualDesktopAddress := ""
@@ -14,59 +14,100 @@ class DesktopMapper
 		;https://msdn.microsoft.com/en-us/library/windows/desktop/mt186440(v=vs.85).aspx
 		CLSID := "{aa509086-5ca9-4c25-8f95-589d3c07b48a}" ;search VirtualDesktopManager clsid
 		IID := "{a5cd92ff-29be-454c-8d04-d82879fb3f1b}" ;search IID_IVirtualDesktopManager
-		this.IVirtualDesktopManager := ComObjCreate(CLSID, IID)
+		this.iVirtualDesktopManager := ComObjCreate(CLSID, IID)
 		
-		this.isWindowOnCurrentVirtualDesktopAddress := NumGet(NumGet(IVirtualDesktopManager+0), 3*A_PtrSize)
-		this.getWindowDesktopIdAddress := NumGet(NumGet(IVirtualDesktopManager+0), 4*A_PtrSize)
-		this.moveWindowToDesktop := NumGet(NumGet(IVirtualDesktopManager+0), 5*A_PtrSize)
+		this.isWindowOnCurrentVirtualDesktopAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 3*A_PtrSize)
+		this.getWindowDesktopIdAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 4*A_PtrSize)
+		this.moveWindowToDesktopAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 5*A_PtrSize)
+
 		return this
 	}
 	
 	mapVirtualDesktops() 
 	{
-		send ^#{right 10}
-		this.desktopMarkers := Object();
+		currentDesktop := new DesktopMarkerClass(this.getWindowDesktopIdAddress, this.isWindowOnCurrentVirtualDesktopAddress, this.iVirtualDesktopManager)
+		send ^#{Left 10}
+		this.DesktopMarkers := Object()
 		this._createMarkers()
+
+		this._returnToDesktop(currentDesktop)
+		;~ debugger("markers created")
 		return this
 	}
 	
 	/*
 	 * returns the desktop number or -1 if there was an error
+	 *
+	 * if tryRemapping is true then if the current desktop isn't mapped we will try mapping it again
 	 */
-	getCurrentDesktopNumber() 
+	getCurrentDesktopNumber(tryRemapping := true) 
 	{
-		loop, % this.desktopMarkers.MaxIndex()
+		this._verifyDesktopMapping()
+		;~ debugger("desktop mapping verified about to find the current desktop number")
+		loop, % this.DesktopMarkers.MaxIndex()
 		{
-			if(this.desktopMarkers[A_Index].virtualDesktopId == otherDesktop.virtualDesktopId)
+			if(this.DesktopMarkers[A_Index].isDesktopCurrentlyActive())
 			{
+				debugger(A_index "is the active desktop")
 				return A_Index
 			}
 		}
+		;debug
+		
+		MsgBox i couldnt find an active desktop
+		if(tryRemapping) 
+		{
+			this.mapVirtualDesktops()
+			return this.getCurrentDesktopNumber(false)
+		}		
+		
 		return -1
+	}
+	
+	/*
+	 * fixes up mapping by removing any markers that have moved desktop 
+	 * (this happens when the user closes a virtual desktop)
+	 *
+	 * does not map new desktops
+	 */
+	_verifyDesktopMapping() 
+	{
+		verifiedDesktopMarkerClass := Object()
+		
+		loop, % this.DesktopMarkers.MaxIndex()
+		{
+			if(this.DesktopMarkers[A_Index].isOnSameDesktop())
+			{
+				verifiedDesktopMarkerClass.Insert(this.DesktopMarkers[A_Index])
+			}
+		}
+		this.DesktopMarkers := verifiedDesktopMarkerClass
+		return this
 	}
 	
 	_createMarkers() 
 	{
 		while(true)
 		{
-			nextMarker := new DesktopMarker()
-		
-			if(this._desktopAlreadyMapped(newDesktop)) 
+			debugger("about to create a gui " A_index)
+			nextMarker := new DesktopMarkerClass(this.getWindowDesktopIdAddress, this.isWindowOnCurrentVirtualDesktopAddress, this.iVirtualDesktopManager)
+			if(this._desktopAlreadyMapped(nextMarker)) 
 			{
-				nextDesktop.Destroy()
+				debugger("the thing is mapped!")
 				return this
 			}
-			this.desktopMarker.Insert(nextMarker)
-			send ^#{left}
+			this.DesktopMarkers.Insert(nextMarker)
+			send ^#{right}
 		}
-		return
+		return this
 	}
 	
 	_desktopAlreadyMapped(otherDesktop) 
 	{
-		loop, % this.desktopMarkers.MaxIndex()
+		loop, % this.DesktopMarkers.MaxIndex()
 		{
-			if(this.desktopMarkers[A_Index].isDesktopCurrentlyActive())
+			debugger(this.DesktopMarkers[A_Index].virtualDesktopId "`n" otherDesktop.virtualDesktopId)
+			if(this.DesktopMarkers[A_Index].virtualDesktopId == otherDesktop.virtualDesktopId)
 			{
 				return true
 			}
@@ -74,78 +115,33 @@ class DesktopMapper
 		;debug
 		return false
 	}
-}
-
-class DesktopMarker
-{
-	hwnd := ""
-	virtualDesktopGuid := ""
-	virtualDesktopId := ""
 	
-	getWindowDesktopIdAddress := ""
-	isWindowOnCurrentVirtualDesktopAddress := ""
-	iVirtualDesktopManager := ""
-	
-	
-	__new(getWindowDesktopIdAddress, isWindowOnCurrentVirtualDesktopAddress, iVirtualDesktopManager) 
+	_returnToDesktop(returnTo)
 	{
-		Gui, show
-		Gui, +HwndMyGuiHwnd
-		this.hwnd := myGuiHwnd
+		currentDesktop := this.getCurrentDesktopNumber()
+		returnToDesktopNumber := 1
 		
-		this.getWindowDesktopIdAddress := getWindowDesktopIdAddress
-		this.isWindowOnCurrentVirtualDesktopAddress := isWindowOnCurrentVirtualDesktopAddress
-		this.iVirtualDesktopManager := iVirtualDesktopManager
+		loop, % this.DesktopMarkers.MaxIndex()
+		{
+			if(this.DesktopMarkers[A_Index].virtualDesktopId == returnTo.virtualDesktopId)
+			{
+				debugger("I need to return to " A_index)
+				returnToDesktopNumber := A_Index
+				break
+			}
+		}
 		
-		this.virtualDesktopGuid := this._getVirtualDesktopID()
-		this.virtualDesktopId := this._guidToStr(this.virtualDesktopGuid)
+		distanceToMove := currentDesktop - returnToDesktopNumber
+		absDistanceToMove := Abs(distanceToMove)
+		
+		if(distanceToMove < 0)
+		{
+			send ^#{right %absDistanceToMove%}
+		} else 
+		{
+			send ^#{left %absDistanceToMove%}
+		}
 		
 		return this
-	}
-	
-	destroy()
-	{
-		hwnd := this.hwnd
-		Gui %hwnd%:Destroy 
-		return this
-	}
-	
-	_getVirtualDesktopID() 
-	{
-		VarSetCapacity(desktopID, 16, 0)
-		;IVirtualDesktopManager::GetWindowDesktopId  method
-		;https://msdn.microsoft.com/en-us/library/windows/desktop/mt186441(v=vs.85).aspx
-		Error := DllCall(this.getWindowDesktopIdAddress, "Ptr", this.iVirtualDesktopManager, "Ptr", this.hWnd, "Ptr", &desktopID)	
-		if(Error != 0) {
-			;debug
-		}
-		return desktopID
-	}
-	
-	isDesktopCurrentlyActive() {
-		;IVirtualDesktopManager::IsWindowOnCurrentVirtualDesktop method
-		;Indicates whether the provided window is on the currently active virtual desktop.
-		;https://msdn.microsoft.com/en-us/library/windows/desktop/mt186442(v=vs.85).aspx
-		Error := DllCall(this.isWindowOnCurrentVirtualDesktopAddress, "Ptr", this.iVirtualDesktopManager, "Ptr", this.hWnd, "IntP", onCurrentDesktop)
-		if(Error != 0) {
-			;debug
-		}
-		return onCurrentDesktop
-	}
-	
-	; https://github.com/cocobelgica/AutoHotkey-Util/blob/master/Guid.ahk#L36
-	_guidToStr(ByRef VarOrAddress)
-	{
-		pGuid := IsByRef(VarOrAddress) ? &VarOrAddress : VarOrAddress
-		VarSetCapacity(sGuid, 78) ; (38 + 1) * 2
-		if !DllCall("ole32\StringFromGUID2", "Ptr", pGuid, "Ptr", &sGuid, "Int", 39)
-			throw Exception("Invalid GUID", -1, Format("<at {1:p}>", pGuid))
-		return StrGet(&sGuid, "UTF-16")
-	}
-	
-	__Delete()
-	{
-		this.destroy()
-		return
 	}
 }
