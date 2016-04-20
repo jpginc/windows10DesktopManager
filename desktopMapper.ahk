@@ -1,152 +1,111 @@
 class DesktopMapperClass
-{
-	DesktopMarkerClass := Object()
+{	
+	desktopIds := []
 	
-	getWindowDesktopIdAddress := ""
-	isWindowOnCurrentVirtualDesktopAddress := ""
-	moveWindowToDesktop  := ""
-	iVirtualDesktopManager := ""
-	
-	__new(iVirtualDesktopManager, isWindowOnCurrentVirtualDesktopAddress, getWindowDesktopIdAddress)
+	__new(virtualDesktopManager)
 	{
-		this.iVirtualDesktopManager := iVirtualDesktopManager
-		this.isWindowOnCurrentVirtualDesktopAddress := isWindowOnCurrentVirtualDesktopAddress
-		this.getWindowDesktopIdAddress := getWindowDesktopIdAddress
-
+		Gui, new
+		Gui, show
+		Gui, +HwndMyGuiHwnd
+		this.hwnd := MyGuiHwnd
+		Gui, hide
+		this.virtualDesktopManager := virtualDesktopManager
 		return this
 	}
 	
 	mapVirtualDesktops() 
 	{
-		currentDesktop := new DesktopMarkerClass(this.getWindowDesktopIdAddress, this.isWindowOnCurrentVirtualDesktopAddress, this.iVirtualDesktopManager)
-		send ^#{Left 10}
-		this.DesktopMarkers := Object()
-		this._createMarkers()
-
-		this._returnToDesktop(currentDesktop)
-		;~ debugger("markers created")
+		currentDesktop := this.getCurrentDesktopId()
+		this.goToFirstDesktop()
+			._reMapDesktopsFromLeftToRight()
+			.goToDesktopByGuid(currentDesktop)
 		return this
 	}
 	
-	getGuidOfDesktop(desktopNumber)
+	goToFirstDesktop()
 	{
-		;~ this._verifyDesktopMapping()
-		return this.DesktopMarkers[desktopNumber]
+		debugger("going to desktop 1")
+		send ^#{Left 20}
+		return this
 	}
 	
-	getHwndOfDesktop(desktopNumber)
+	goToDesktopByGuid(guid)
 	{
-		;~ this._verifyDesktopMapping()
-		return this.DesktopMarkers[desktopNumber].hwnd
+		this.goToDesktop(this._indexOfGuid(guid))
+		return this
 	}
 	
-	/*
-	 * returns the desktop number or -1 if there was an error
-	 *
-	 * if tryRemapping is true then if the current desktop isn't mapped we will try mapping it again
-	 */
-	getCurrentDesktopNumber(tryRemapping := true) 
+	goToDesktop(newDesktopNumber)
 	{
-		this._verifyDesktopMapping()
-		;~ debugger("desktop mapping verified about to find the current desktop number")
-		loop, % this.DesktopMarkers.MaxIndex()
+		currentDesktop := this.getDesktopNumber()
+		direction := currentDesktop - newDesktopNumber
+		distance := Abs(direction)
+		
+		if(direction < 0)
 		{
-			if(this.DesktopMarkers[A_Index].isDesktopCurrentlyActive())
+			send ^#{right %distance%}
+		} else
+		{
+			send ^#{left %distance%}
+		}
+		return this
+	}
+	
+	getCurrentDesktopId()
+	{
+		hwnd := this.hwnd
+		Gui %hwnd%:show 
+		sleep 50 ;this is necessary, not sure why...
+		
+		guid := this.virtualDesktopManager.getDesktopGuid(hwnd)
+
+		Gui %hwnd%:hide 
+		sleep 100 ;this is necessary, not sure why...
+		return guid
+	}
+	
+	getDesktopNumber()
+	{
+		currentDesktop := this.getCurrentDesktopId()
+		if(! this._desktopAlreadyMapped(currentDesktop))
+		{
+			this.mapVirtualDesktops()
+		}	
+		return this._indexOfGuid(currentDesktop)
+	}
+	
+	_reMapDesktopsFromLeftToRight()
+	{
+		debugger("About to remap")
+		this.desktopIds := []
+		while, true
+		{
+			nextDesktopGuid := this.getCurrentDesktopId()
+			debugger("next guid is " nextDesktopGuid)
+			sleep 100
+			if(this._desktopAlreadyMapped(nextDesktopGuid))
 			{
-				debugger(A_index "is the active desktop")
+				return this
+			}
+			this.desktopIds.Insert(nextDesktopGuid)
+			send ^#{right}
+		}
+	}
+
+	_indexOfGuid(guid) 
+	{
+		loop, % this.desktopIds.MaxIndex()
+		{
+			if(this.desktopIds[A_index] == guid)
+			{
 				return A_Index
 			}
 		}
-		;debug
-		
-		MsgBox i couldnt find an active desktop
-		if(tryRemapping) 
-		{
-			this.mapVirtualDesktops()
-			return this.getCurrentDesktopNumber(false)
-		}		
-		
 		return -1
-	}
-	
-	/*
-	 * fixes up mapping by removing any markers that have moved desktop 
-	 * (this happens when the user closes a virtual desktop)
-	 *
-	 * does not map new desktops
-	 */
-	_verifyDesktopMapping() 
-	{
-		verifiedDesktopMarkerClass := Object()
-		
-		loop, % this.DesktopMarkers.MaxIndex()
-		{
-			if(this.DesktopMarkers[A_Index].isOnSameDesktop())
-			{
-				verifiedDesktopMarkerClass.Insert(this.DesktopMarkers[A_Index])
-			}
-		}
-		this.DesktopMarkers := verifiedDesktopMarkerClass
-		return this
-	}
-	
-	_createMarkers() 
-	{
-		while(true)
-		{
-			debugger("about to create a gui " A_index)
-			nextMarker := new DesktopMarkerClass(this.getWindowDesktopIdAddress, this.isWindowOnCurrentVirtualDesktopAddress, this.iVirtualDesktopManager)
-			if(this._desktopAlreadyMapped(nextMarker)) 
-			{
-				debugger("the thing is mapped!")
-				return this
-			}
-			this.DesktopMarkers.Insert(nextMarker)
-			send ^#{right}
-		}
-		return this
 	}
 	
 	_desktopAlreadyMapped(otherDesktop) 
 	{
-		loop, % this.DesktopMarkers.MaxIndex()
-		{
-			debugger(this.DesktopMarkers[A_Index].virtualDesktopId "`n" otherDesktop.virtualDesktopId)
-			if(this.DesktopMarkers[A_Index].virtualDesktopId == otherDesktop.virtualDesktopId)
-			{
-				return true
-			}
-		}
-		;debug
-		return false
-	}
-	
-	_returnToDesktop(returnTo)
-	{
-		currentDesktop := this.getCurrentDesktopNumber()
-		returnToDesktopNumber := 1
-		
-		loop, % this.DesktopMarkers.MaxIndex()
-		{
-			if(this.DesktopMarkers[A_Index].virtualDesktopId == returnTo.virtualDesktopId)
-			{
-				debugger("I need to return to " A_index)
-				returnToDesktopNumber := A_Index
-				break
-			}
-		}
-		
-		distanceToMove := currentDesktop - returnToDesktopNumber
-		absDistanceToMove := Abs(distanceToMove)
-		
-		if(distanceToMove < 0)
-		{
-			send ^#{right %absDistanceToMove%}
-		} else 
-		{
-			send ^#{left %absDistanceToMove%}
-		}
-		
-		return this
+		return this._indexOfGuid(otherDesktop) != -1
 	}
 }

@@ -12,10 +12,9 @@
 	__new(getWindowDesktopIdAddress, isWindowOnCurrentVirtualDesktopAddress, iVirtualDesktopManager) 
 	{
 		Gui, new
-		Gui, Show, x55 y66 w300 h200, New Title
 		Gui, +HwndMyGuiHwnd
 		this.hwnd := myGuiHwnd
-
+		
 		this.getWindowDesktopIdAddress := getWindowDesktopIdAddress
 		this.isWindowOnCurrentVirtualDesktopAddress := isWindowOnCurrentVirtualDesktopAddress
 		this.iVirtualDesktopManager := iVirtualDesktopManager
@@ -56,10 +55,14 @@
 		;IVirtualDesktopManager::IsWindowOnCurrentVirtualDesktop method
 		;Indicates whether the provided window is on the currently active virtual desktop.
 		;https://msdn.microsoft.com/en-us/library/windows/desktop/mt186442(v=vs.85).aspx
+		;~ WinSet, ExStyle, -0x80 , % "Ahk_id " this.hWnd ;we need the alt tab menu otherwise this function doesn't work
+		;~ sleep 500
 		Error := DllCall(this.isWindowOnCurrentVirtualDesktopAddress, "Ptr", this.iVirtualDesktopManager, "Ptr", this.hWnd, "IntP", onCurrentDesktop)
 		if(Error != 0) {
 			msgbox error in isDesktopCurrentlyActive
 		}
+		;~ WinSet, ExStyle, +0x80 , % "Ahk_id " this.hWnd ;remove the window from the alt tab menu again
+
 		return onCurrentDesktop
 	}
 	
@@ -69,10 +72,14 @@
 		VarSetCapacity(desktopID, 16, 0)
 		;IVirtualDesktopManager::GetWindowDesktopId  method
 		;https://msdn.microsoft.com/en-us/library/windows/desktop/mt186441(v=vs.85).aspx
+		
+		;~ WinSet, ExStyle, -0x80 , % "Ahk_id " this.hWnd ;we need the alt tab menu otherwise this function doesn't work
+		;~ sleep 500
 		Error := DllCall(this.getWindowDesktopIdAddress, "Ptr", this.iVirtualDesktopManager, "Ptr", this.hWnd, "Ptr", &desktopID)	
 		if(Error != 0) {
 			msgbox % "error in _getVirtualDesktopId " Error "`n" this.hwnd
 		}
+		;~ WinSet, ExStyle, +0x80 , % "Ahk_id " this.hWnd ;remove the window from the alt tab menu again
 		return &desktopID
 	}
 	

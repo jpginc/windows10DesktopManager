@@ -6,43 +6,16 @@ JPGIncDesktopManagerCallback(desktopManager, functionName, keyPressed)
 
 class JPGIncDesktopManagerClass
 {
-	iVirtualDesktopManager := ""
-	isWindowOnCurrentVirtualDesktopAddress := ""
-	getWindowDesktopIdAddress := ""
-	moveWindowToDesktopAddress := ""
-	
+	notAnAutohotkeyModKeyRegex := "[^#!^+<>*~$]"
 	moveWinMod := "moveWindowModKey"
 	changeVDMod := "changeDesktopModKey"
-	notAnAutohotkeyModKeyRegex := "[^#!^+<>*~$]"
-	
-	desktopMapper := ""
-	
-	
+		
 	__new(options) 
 	{
-		this.setupIVirtualDesktopManager()
 		this.options := options
-		this.desktopMapper := new DesktopMapperClass(this.iVirtualDesktopManager, this.isWindowOnCurrentVirtualDesktopAddress, this.getWindowDesktopIdAddress)
+		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
 		
-		this.desktopMapper.mapVirtualDesktops() ;don't need to do this. it will map the first time it's used
 		this.mapHotkeys()
-		
-		return this
-	}
-	
-	setupIVirtualDesktopManager()
-	{
-		;IVirtualDesktopManager interface
-		;Exposes methods that enable an application to interact with groups of windows that form virtual workspaces.
-		;https://msdn.microsoft.com/en-us/library/windows/desktop/mt186440(v=vs.85).aspx
-		CLSID := "{aa509086-5ca9-4c25-8f95-589d3c07b48a}" ;search VirtualDesktopManager clsid
-		IID := "{a5cd92ff-29be-454c-8d04-d82879fb3f1b}" ;search IID_IVirtualDesktopManager
-		this.iVirtualDesktopManager := ComObjCreate(CLSID, IID)
-		
-		this.isWindowOnCurrentVirtualDesktopAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 3*A_PtrSize)
-		this.getWindowDesktopIdAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 4*A_PtrSize)
-		this.moveWindowToDesktopAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 5*A_PtrSize)
-	
 		return this
 	}
 	
@@ -52,7 +25,7 @@ class JPGIncDesktopManagerClass
 		loop, 10
 		{
 			moveCallback := Func("JPGIncDesktopManagerCallback").Bind(this, "moveActiveWindowToDesktop", A_Index - 1)
-			changeCallback := Func("JPGIncDesktopManagerCallback").Bind(this, "moveToDesktop", A_Index -1)
+			changeCallback := Func("JPGIncDesktopManagerCallback").Bind(this, "goToDesktop", A_Index -1)
 			Hotkey, If
 			if(this.options[this.moveWinMod]) 
 			{
@@ -87,27 +60,34 @@ class JPGIncDesktopManagerClass
 	/*
 	 *	swap to the given virtual desktop number
 	 */
-	moveToDesktop(newDesktopNumber) 
+	goToDesktop(newDesktopNumber) 
 	{
-		this._moveToDesktop(newDesktopNumber)
+		debugger("in go to desktop changing to " newDesktopNumber)
+		this._goToDesktop(newDesktopNumber)
+			.closeMultitaskingViewFrame()
 			.doPostMoveDesktop()
 		return this
-	}	
-	
-	_moveToDesktop(newDesktopNumber)
+	}
+
+	_goToDesktop(newDesktopNumber)
 	{
-		currentDesktopNumber := this.desktopMapper.getCurrentDesktopNumber()
-		distanceToMove := currentDesktopNumber - newDesktopNumber
-		absDistanceToMove := Abs(distanceToMove)
-		debugger("current " currentDesktopNumber "`ndistance: " distanceToMove)
-		if(distanceToMove < 0)
+		currentDesktop := this.desktopMapper.getDesktopNumber()
+		direction := currentDesktop - newDesktopNumber
+		distance := Abs(direction)
+		debugger("distance to move is " distance "`ndirectin" direction)
+		if(direction < 0)
 		{
-			send ^#{right %absDistanceToMove%}
-		} else 
+			debugger("Sending right!")
+			send ^#{right %distance%}
+		} else
 		{
-			send ^#{left %absDistanceToMove%}
+			send ^#{left %distance%}
 		}
-		
+		return this
+	}
+	
+	closeMultitaskingViewFrame()
+	{
 		IfWinActive, ahk_class MultitaskingViewFrame
 		{
 			send, #{tab}
@@ -141,30 +121,12 @@ class JPGIncDesktopManagerClass
 	
 	moveActiveWindowToDesktop(newDesktopNumber, follow := false)
 	{
-		;~ newDesktopGuid := this.desktopMapper.getGuidOfDesktop(newDesktopNumber)._getVirtualDesktopId()
-		toMoveHwnd := this.desktopMapper.getHwndOfDesktop(2)
-		moveToHwnd := this.desktopMapper.getHwndOfDesktop(1)
+		newDesktopGuid := this.desktopMapper.getGuidOfDesktop(newDesktopNumber)._getVirtualDesktopId()
+		activeHwnd := this.desktopMapper.getHwndOfDesktop(newDesktopNumber)
 		;~ WinExist("A")
 		
-		this._moveWindowToDesktop(toMoveHwnd, moveToHwnd)
+		this._moveWindowToDesktop(activeHwnd)
 		return	this
-	}
-	
-	_moveWindowToDesktop(toMoveHwnd, moveToHwnd)
-	{
-		desktopId := ""
-		VarSetCapacity(desktopID, 16, 0)
-		Error := DllCall(this.getWindowDesktopIdAddress, "Ptr", this.iVirtualDesktopManager, "Ptr",moveToHwnd , "Ptr", &desktopID)	
-		if(Error != 0) {
-			msgbox % "error in _getVirtualDesktopId " Error "`n" this.hwnd
-		}
-		Error := DllCall(this.moveWindowToDesktopAddress, "Ptr", this.iVirtualDesktopManager, "Ptr", toMoveHwnd, "Ptr", &desktopID)
-		if(Error != 0) {
-			msgbox % "error in _moveWindowToDesktop " Error "but no error?"
-			clipboard := error
-		}
-		MsgBox done
-		return this
 	}
 	
 	getIndexFromArray(searchFor, array) 
