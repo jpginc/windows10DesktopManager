@@ -55,12 +55,14 @@ class DesktopMapperClass
 	{
 		hwnd := this.hwnd
 		Gui %hwnd%:show 
-		sleep 50 ;this is necessary, not sure why...
+		winwait, % "Ahk_id " hwnd
 		
 		guid := this.virtualDesktopManager.getDesktopGuid(hwnd)
 
 		Gui %hwnd%:hide 
-		sleep 100 ;this is necessary, not sure why...
+		;if you don't wait until it closes then the desktop the gui is on can get focus
+		WinWaitClose,  % "Ahk_id " hwnd
+
 		return guid
 	}
 	
