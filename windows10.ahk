@@ -17,8 +17,9 @@ return
 #Include desktopMapper.ahk
 #include virtualDesktopManager.ahk
 
-debugger(message) {
-	;~ ToolTip, % message
-	;~ sleep 10
+debugger(message) 
+{
+	ToolTip, % message
+	sleep 10
 	return
 }

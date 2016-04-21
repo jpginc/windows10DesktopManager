@@ -4,57 +4,42 @@ class DesktopMapperClass
 	
 	__new(virtualDesktopManager)
 	{
-		Gui, new
-		Gui, show
-		Gui, +HwndMyGuiHwnd
-		this.hwnd := MyGuiHwnd
-		Gui, hide
+		this._setupGui()
 		this.virtualDesktopManager := virtualDesktopManager
 		return this
 	}
 	
+	/*
+	 * Populates the desktopIds array with the current virtual deskops according to the registry key
+	 */
 	mapVirtualDesktops() 
 	{
-		currentDesktop := this.getCurrentDesktopId()
-		this.goToFirstDesktop()
-			._reMapDesktopsFromLeftToRight()
-			.goToDesktopByGuid(currentDesktop)
-		return this
-	}
+		regIdLength := 32
+		RegRead, DesktopList, HKEY_CURRENT_USER, SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VirtualDesktops, VirtualDesktopIDs
 	
-	goToFirstDesktop()
-	{
-		debugger("going to desktop 1")
-		send ^#{Left 20}
-		return this
-	}
-	
-	goToDesktopByGuid(guid)
-	{
-		this.goToDesktop(this._indexOfGuid(guid))
-		return this
-	}
-	
-	goToDesktop(newDesktopNumber)
-	{
-		currentDesktop := this.getDesktopNumber()
-		direction := currentDesktop - newDesktopNumber
-		distance := Abs(direction)
-		
-		if(direction < 0)
+		this.desktopIds := []
+		while, true
 		{
-			send ^#{right %distance%}
-		} else
-		{
-			send ^#{left %distance%}
+			desktopId := SubStr(DesktopList, ((A_index-1) * regIdLength) + 1, regIdLength)
+			if(desktopId) 
+			{
+				this.desktopIds.Insert(this._idFromReg(desktopId))
+			} else
+			{
+				break
+			}
 		}
+		debugger("there are " this.desktopIds.MaxIndex() " things")
 		return this
 	}
 	
+	/*
+	 * Gets the desktop id of the current desktop
+	 */
 	getCurrentDesktopId()
 	{
 		hwnd := this.hwnd
-		Gui %hwnd%:show 
+		Gui %hwnd%:show, NA ;show but don't activate
 		winwait, % "Ahk_id " hwnd
 		
 		guid := this.virtualDesktopManager.getDesktopGuid(hwnd)
@@ -63,51 +48,63 @@ class DesktopMapperClass
 		;if you don't wait until it closes then the desktop the gui is on can get focus
 		WinWaitClose,  % "Ahk_id " hwnd
 
-		return guid
+		return this._idFromGuid(guid)
 	}
 	
+	getNumberOfDesktops() 
+	{
+		this.mapVirtualDesktops()
+		return this.desktopIds.maxIndex()
+	}
+	
+	/*
+	 * returns the number of the current desktop
+	 */
 	getDesktopNumber()
 	{
+		this.mapVirtualDesktops()
 		currentDesktop := this.getCurrentDesktopId()
-		if(! this._desktopAlreadyMapped(currentDesktop))
-		{
-			this.mapVirtualDesktops()
-		}	
-		return this._indexOfGuid(currentDesktop)
+		
+		return this._indexOfId(currentDesktop)
 	}
 	
-	_reMapDesktopsFromLeftToRight()
+	/*
+	 * takes an ID from the registry and extracts the last 16 characters (which matches the last 16 characters of the GUID)
+	 */
+	_idFromReg(regString) 
 	{
-		debugger("About to remap")
-		this.desktopIds := []
-		while, true
-		{
-			nextDesktopGuid := this.getCurrentDesktopId()
-			debugger("next guid is " nextDesktopGuid)
-			sleep 100
-			if(this._desktopAlreadyMapped(nextDesktopGuid))
-			{
-				return this
-			}
-			this.desktopIds.Insert(nextDesktopGuid)
-			send ^#{right}
-		}
+		return SubStr(regString, 17)
+	}
+	
+	/*
+	 * takes an ID from microsofts IVirtualDesktopManager and extracts the last 16 characters (which matches the last 16 characters of the ID from the registry)
+	 */
+	_idFromGuid(guidString)
+	{
+		return SubStr(RegExReplace(guidString, "[-{}]"), 17)
 	}
 
-	_indexOfGuid(guid) 
+	_indexOfId(guid) 
 	{
 		loop, % this.desktopIds.MaxIndex()
 		{
-			if(this.desktopIds[A_index] == guid)
+			debugger("looking for `n" guid "`n" this.desktopIds[A_index])
+			if(this.desktopIds[A_index] == guid) 
 			{
+				debugger("Found it! desktop is " A_Index)
 				return A_Index
 			}
 		}
 		return -1
 	}
-	
-	_desktopAlreadyMapped(otherDesktop) 
+
+	_setupGui()
 	{
-		return this._indexOfGuid(otherDesktop) != -1
+		Gui, new
+		Gui, show
+		Gui, +HwndMyGuiHwnd
+		this.hwnd := MyGuiHwnd
+		Gui, hide
+		return this
 	}
 }
