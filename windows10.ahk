@@ -19,7 +19,7 @@ return
 
 debugger(message) 
 {
-	ToolTip, % message
-	sleep 10
+	;~ ToolTip, % message
+	;~ sleep 10
 	return
 }

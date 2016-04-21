@@ -107,6 +107,16 @@ class JPGIncDesktopManagerClass
 		return this
 	}
 	
+	openMultitaskingViewFrame()
+	{
+		IfWinNotActive, ahk_class MultitaskingViewFrame
+		{
+			send, #{tab}
+			WinWaitActive, ahk_class MultitaskingViewFrame
+		}
+		return this
+	}
+	
 	doPostMoveDesktop() 
 	{
 		this._callFunction(this.options.postChangeDesktop)
@@ -131,13 +141,24 @@ class JPGIncDesktopManagerClass
 		return this
 	}
 	
-	moveActiveWindowToDesktop(newDesktopNumber, follow := false)
+	moveActiveWindowToDesktop(targetDesktop, follow := false)
 	{
-		newDesktopGuid := this.desktopMapper.getGuidOfDesktop(newDesktopNumber)._getVirtualDesktopId()
-		activeHwnd := this.desktopMapper.getHwndOfDesktop(newDesktopNumber)
-		;~ WinExist("A")
+		currentDesktop := this.desktopMapper.getDesktopNumber()
+		this.openMultitaskingViewFrame()
 		
-		this._moveWindowToDesktop(activeHwnd)
+		; This part figures out how many times we need to push down within the context menu to get the desktop we want.	
+		if (targetDesktop > currentDesktop)
+		{
+			targetDesktop -= 2
+		}
+		else
+		{
+			targetdesktop--
+		}
+		
+		Send {Appskey}m{Down %targetDesktop%}{Enter}
+		
+		this.closeMultitaskingViewFrame()
 		return	this
 	}
 	
