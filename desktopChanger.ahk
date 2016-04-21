@@ -63,9 +63,21 @@ class JPGIncDesktopManagerClass
 	goToDesktop(newDesktopNumber) 
 	{
 		debugger("in go to desktop changing to " newDesktopNumber)
-		this._goToDesktop(newDesktopNumber)
+		this._makeDesktopsIfRequired(newDesktopNumber)
+			._goToDesktop(newDesktopNumber)
 			.closeMultitaskingViewFrame()
 			.doPostMoveDesktop()
+		return this
+	}
+	
+	_makeDesktopsIfRequired(minimumNumberOfDesktops)
+	{
+		currentNumberOfDesktops := this.desktopMapper.getNumberOfDesktops()
+		loop, % minimumNumberOfDesktops - currentNumberOfDesktops
+		{
+			Send, #^d
+		}
+		
 		return this
 	}
 
