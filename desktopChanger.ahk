@@ -8,7 +8,7 @@ class JPGIncDesktopManagerClass
 {
 	notAnAutohotkeyModKeyRegex := "[^#!^+<>*~$]"
 	moveWinMod := "moveWindowModKey"
-	changeVDMod := "changeDesktopModKey"
+	changeVDMod := "goToDesktopModKey"
 		
 	__new(options) 
 	{

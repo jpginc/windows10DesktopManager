@@ -1,16 +1,40 @@
-
 #SingleInstance
+/*
+ * 	The options object below defines the hotkeys for the window manager. 
+ *  
+ *	Usage:
+ *  An Empty Object:
+ * 		Pressing numbers 1 through 0 while in the multi tasking view (the view that comes up after pressing win + tab) will go to the desktop number that you pressed
+ *
+ *  "goToDesktopModKey" : modKey (optional)
+ * 		the key or modifier for going to a desktop. 
+ *		Example: "#" == windows key + number to go to another desktop
+ *
+ * 	"moveWindowModKey" : ModKey (optional)
+ *		The key or modifier for moving the active window to a desktop
+ *		Example: "+#" == shift + windows key + number to go to another desktop
+ *
+ *	"postChangeDesktop" : function name or function object (optional)
+ *		A function that will be called after moving desktops
+ *
+ *	"postMoveWindow": function name or function object (optional)
+ *		A function that will be called after moving the active window to a desktop
+ * 	
+ */
+options := {"goToDesktopModKey" : "Capslock" ;capslock + number number jumpts to desktop
+	,"moveWindowModKey" : "+#" ;windows key + shift + number moves the active window to a desktop
+	,"postChangeDesktop" : Func("afterDesktopChangeTurnOffCapslock").bind()} ;after moving the active window turn off capslock
+	
+globalDesktopManager := new JPGIncDesktopManagerClass(options)
+return
+
+
 afterDesktopChangeTurnOffCapslock()
 {
 	SetCapsLockState , Off
 	return
 }
-options := {"moveWindowModKey" : "Capslock"
-	,"changeDesktopModKey" : "#"
-	,"postChangeDesktop" : Func("afterDesktopChangeTurnOffCapslock").bind()}
-	
-globalDesktopManager := new JPGIncDesktopManagerClass(options)
-return
+
 #c::ExitApp
 
 #Include desktopChanger.ahk
