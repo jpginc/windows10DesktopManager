@@ -14,6 +14,7 @@ class JPGIncDesktopManagerClass
 	{
 		this.options := options
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
+		this.monitorMapper := new MonitorMapperClass()
 		
 		this.mapHotkeys()
 		return this
@@ -75,9 +76,23 @@ class JPGIncDesktopManagerClass
 		currentNumberOfDesktops := this.desktopMapper.getNumberOfDesktops()
 		loop, % minimumNumberOfDesktops - currentNumberOfDesktops
 		{
-			Send, #^d
+			this._send("#^d")
 		}
 		
+		return this
+	}
+	
+	/*
+	 * If we send the keystrokes too quickly you sometimes get a flickering of the screen
+	 */
+	_send(toSend)
+	{
+		oldDelay := A_KeyDelay
+		SetKeyDelay, 30
+		
+		send, % toSend
+		
+		SetKeyDelay, % oldDelay
 		return this
 	}
 
@@ -89,11 +104,11 @@ class JPGIncDesktopManagerClass
 		debugger("distance to move is " distance "`ndirectin" direction)
 		if(direction < 0)
 		{
-			debugger("Sending right!")
-			send ^#{right %distance%}
+			debugger("Sending right! " distance "times")
+			this._send("^#{right " distance "}")
 		} else
 		{
-			send ^#{left %distance%}
+			this._send("^#{left " distance "}")
 		}
 		return this
 	}
@@ -102,7 +117,7 @@ class JPGIncDesktopManagerClass
 	{
 		IfWinActive, ahk_class MultitaskingViewFrame
 		{
-			send, #{tab}
+			this._send("#{tab}")
 		}
 		return this
 	}
@@ -111,7 +126,7 @@ class JPGIncDesktopManagerClass
 	{
 		IfWinNotActive, ahk_class MultitaskingViewFrame
 		{
-			send, #{tab}
+			this._send("#{tab}")
 			WinWaitActive, ahk_class MultitaskingViewFrame
 		}
 		return this
@@ -144,8 +159,24 @@ class JPGIncDesktopManagerClass
 	moveActiveWindowToDesktop(targetDesktop, follow := false)
 	{
 		currentDesktop := this.desktopMapper.getDesktopNumber()
-		this.openMultitaskingViewFrame()
+		if(currentDesktop == targetDesktop) 
+		{
+			return this
+		}
+		numberOfTabsNeededToSelectActiveMonitor := this.monitorMapper.getRequiredTabCount(WinActive("A"))
+		numberOfDownsNeededToSelectDesktop := this.getNumberOfDownsNeededToSelectDesktop(targetDesktop, currentDesktop)
 		
+		this.openMultitaskingViewFrame()
+			._send("{tab " numberOfTabsNeededToSelectActiveMonitor "}")
+			._send("{Appskey}m{Down " numberOfDownsNeededToSelectDesktop "}{Enter}")
+			.closeMultitaskingViewFrame()
+			.doPostMoveWindow()
+		
+		return	this
+	}
+	
+	getNumberOfDownsNeededToSelectDesktop(targetDesktop, currentDesktop)
+	{
 		; This part figures out how many times we need to push down within the context menu to get the desktop we want.	
 		if (targetDesktop > currentDesktop)
 		{
@@ -155,11 +186,7 @@ class JPGIncDesktopManagerClass
 		{
 			targetdesktop--
 		}
-		
-		Send {Appskey}m{Down %targetDesktop%}{Enter}
-		
-		this.closeMultitaskingViewFrame()
-		return	this
+		return targetDesktop
 	}
 	
 	getIndexFromArray(searchFor, array) 

@@ -16,6 +16,7 @@ return
 #Include desktopChanger.ahk
 #Include desktopMapper.ahk
 #include virtualDesktopManager.ahk
+#Include monitorMapper.ahk
 
 debugger(message) 
 {
