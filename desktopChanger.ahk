@@ -1,5 +1,9 @@
 JPGIncDesktopManagerCallback(desktopManager, functionName, keyPressed)
 {
+	if(keyPressed == 0) 
+	{
+		keyPressed := 10
+	}
 	desktopManager[functionName](keyPressed)
 	return
 }

@@ -12,7 +12,7 @@
  *
  * 	"moveWindowModKey" : ModKey (optional)
  *		The key or modifier for moving the active window to a desktop
- *		Example: "+#" == shift + windows key + number to go to another desktop
+ *		Example: "+#" == shift + windows key + number moves the active window to another desktop
  *
  *	"postChangeDesktop" : function name or function object (optional)
  *		A function that will be called after moving desktops
@@ -21,7 +21,7 @@
  *		A function that will be called after moving the active window to a desktop
  * 	
  */
-options := {"goToDesktopModKey" : "Capslock" ;capslock + number number jumpts to desktop
+options := {"goToDesktopModKey" : "Capslock" ;capslock + number number jumps to desktop
 	,"moveWindowModKey" : "+#" ;windows key + shift + number moves the active window to a desktop
 	,"postChangeDesktop" : Func("afterDesktopChangeTurnOffCapslock").bind()} ;after moving the active window turn off capslock
 	
