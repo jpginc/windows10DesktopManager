@@ -15,19 +15,23 @@
 		return this
 	}
 	
-	getWindowDesktopId(hWnd) 
+	getWindowDesktopId(hWnd, tryAgain := true) 
 	{
 		desktopId := ""
 		VarSetCapacity(desktopID, 16, 0)
 		;IVirtualDesktopManager::GetWindowDesktopId  method
 		;https://msdn.microsoft.com/en-us/library/windows/desktop/mt186441(v=vs.85).aspx
-
+ 
 		Error := DllCall(this.getWindowDesktopIdAddress, "Ptr", this.iVirtualDesktopManager, "Ptr", hWnd, "Ptr", &desktopID)	
 		if(Error != 0) {
+			if(tryAgain) 
+			{
+				return this.getWindowDesktopId(hwnd, false)
+			}
 			msgbox % "error in getWindowDesktopId " Error
 			clipboard := error
 		}
-
+ 
 		return &desktopID
 	}
 	
