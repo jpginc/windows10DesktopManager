@@ -36,13 +36,13 @@ class JPGIncDesktopManagerClass
 		return this
 	}
 	
-	afterGoToDesktopHotkey(functionLabelOrClassWithCallMethodName)
+	afterGoToDesktop(functionLabelOrClassWithCallMethodName)
 	{
 		this._postGoToDesktopFunctionName := functionLabelOrClassWithCallMethodName
 		return this
 	}
 	
-	afterMoveWindowToDesktopHotkey(functionLabelOrClassWithCallMethodName)
+	afterMoveWindowToDesktop(functionLabelOrClassWithCallMethodName)
 	{
 		this._postMoveWindowFunctionName := functionLabelOrClassWithCallMethodName
 		return this

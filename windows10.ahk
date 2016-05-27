@@ -34,7 +34,7 @@
 globalDesktopManager := new JPGIncDesktopManagerClass()
 globalDesktopManager.hotkeyManager.goToDesktopHotkey("Capslock")
 globalDesktopManager.hotkeyManager.moveWindowToDesktopHotkey("+#")
-globalDesktopManager.afterGoToDesktopHotkey("afterDesktopChangeTurnOffCapslock")
+globalDesktopManager.afterGoToDesktop("afterDesktopChangeTurnOffCapslock")
 
 return
 
