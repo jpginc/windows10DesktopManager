@@ -6,7 +6,7 @@ class JPGIncDesktopManagerClass
 	goToDesktopCallbackFunctionName := "goToDesktop"
 	moveActiveWindowToDesktopFunctionName := "moveActiveWindowToDesktop"
 	
-	__new(options) 
+	__new(options := "") 
 	{
 		this.options := options
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
@@ -125,6 +125,9 @@ class JPGIncDesktopManagerClass
 		} else if(IsObject(possibleFunction))
 		{
 			possibleFunction.Call()
+		} else if(IsLabel(possibleFunction))
+		{
+			gosub, % possibleFunction
 		}
 		return this
 	}
