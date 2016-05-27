@@ -26,6 +26,9 @@ options := {"goToDesktopModKey" : "Capslock" ;capslock + number number jumps to 
 	,"postChangeDesktop" : Func("afterDesktopChangeTurnOffCapslock").bind()} ;after moving the active window turn off capslock
 	
 globalDesktopManager := new JPGIncDesktopManagerClass(options)
+
+;~ change the got to desktop hotkey from capslock (which was set in the options above) to just the windows key
+;~ globalDesktopManager.hotkeyManager.goToDesktopHotkey("#")
 return
 
 

@@ -1,5 +1,11 @@
 class JPGIncDesktopManagerClass
 {		
+	_optionsMoveWindowHotkey := "moveWindowModKey"
+	_optionsChangeVirtualDesktopHotkey := "goToDesktopModKey"
+	
+	goToDesktopCallbackFunctionName := "goToDesktop"
+	moveActiveWindowToDesktopFunctionName := "moveActiveWindowToDesktop"
+	
 	__new(options) 
 	{
 		this.options := options
@@ -7,10 +13,24 @@ class JPGIncDesktopManagerClass
 		this.monitorMapper := new MonitorMapperClass()
 		this.hotkeyManager := new JPGIncHotkeyManager(this)
 		
-		this.hotkeyManager.setupHotkeys(this.options)
+		this._setupHotkeysFromOptions(options)
 		return this
 	}
-
+	
+	_setupHotkeysFromOptions(options) 
+	{
+		this.hotkeyManager.setupDefaultHotkeys()
+		if(options[this._optionsMoveWindowHotkey])
+		{
+			this.hotkeyManager.moveWindowToDesktopHotkey(options[this._optionsMoveWindowHotkey])
+		}
+		if(options[this._optionsChangeVirtualDesktopHotkey])
+		{
+			this.hotkeyManager.goToDesktopHotkey(options[this._optionsChangeVirtualDesktopHotkey])
+		}
+		return this
+	}
+	
 	/*
 	 *	swap to the given virtual desktop number
 	 */

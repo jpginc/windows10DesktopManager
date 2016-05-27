@@ -16,8 +16,7 @@ class JPGIncHotkeyManager
 	_notAnAutohotkeyModKeyRegex := "[^#!^+<>*~$]"
 	_desktopManager := ""
 	
-	_optionsMoveWindowHotkey := "moveWindowModKey"
-	_optionsChangeVirtualDesktopHotkey := "goToDesktopModKey"
+	_hotkeys := {}
 	
 	__new(desktopManager) 
 	{
@@ -25,26 +24,62 @@ class JPGIncHotkeyManager
 		return this
 	}
 	
-	setupHotkeys(options) 
+	goToDesktopHotkey(hotkeyKey) 
 	{
-		options := this._fixModKeysForHotkeySyntax(options)
+		callbackName := this._desktopManager.goToDesktopCallbackFunctionName
+		return this._setupHotkey(callbackName, hotkeyKey)
+	}
+	
+	moveWindowToDesktopHotkey(hotkeyKey)
+	{
+		callbackName := this._desktopManager.moveActiveWindowToDesktopFunctionName
+		return this._setupHotkey(callbackName, hotkeyKey)
+	}
+	
+	_setupHotkey(callbackFunctionName, hotkeyKey)
+	{
+		if(this._doesHotkeyRequireCustomHotkeySyntax(hotkeyKey)) 
+		{
+			hotkeyKey .= " & "
+		}
+		
+		;remove the old keybindings and save the new keybinding
+		this._removeHotkey(callbackFunctionName)
+		this._hotkeys[callbackFunctionName] := hotkeyKey
+		
 		loop, 10
 		{
-			moveCallback := Func("JPGIncDesktopManagerCallback").Bind(this._desktopManager, "moveActiveWindowToDesktop", A_Index - 1)
-			changeCallback := Func("JPGIncDesktopManagerCallback").Bind(this._desktopManager, "goToDesktop", A_Index -1)
-			Hotkey, If
-			if(options[this._optionsMoveWindowHotkey]) 
-			{
-				Hotkey, % options[this._optionsMoveWindowHotkey] (A_index -1), % moveCallback
-			}
-			if(options[this._optionsChangeVirtualDesktopHotkey]) 
-			{
-				Hotkey, % options[this._optionsChangeVirtualDesktopHotkey] (A_index -1), % changeCallback
-			}
-			
-			Hotkey, IfWinActive, ahk_class MultitaskingViewFrame
-			Hotkey, % "*" (A_index -1), % changeCallback ;if the user has already pressed win + tab then numbers quicly change desktops
+			callback := Func("JPGIncDesktopManagerCallback").Bind(this._desktopManager, callbackFunctionName, A_Index -1)
+			Hotkey, % hotkeyKey (A_index -1), % callback, On
 		}
+		
+		return this
+	}
+	
+	_removeHotkey(hotkeyIndex) 
+	{
+		hotkeyKey := this._hotkeys[hotkeyIndex]
+		if(hotkeyKey)
+		{
+			loop, 10
+			{
+				Hotkey, % hotkeyKey (A_index -1), Off
+			}
+		}
+		return this
+	}
+	
+	setupDefaultHotkeys() 
+	{
+		callbackFunctionName := this._desktopManager.goToDesktopCallbackFunctionName
+		
+		Hotkey, IfWinActive, ahk_class MultitaskingViewFrame
+		loop, 10
+		{
+			callback := Func("JPGIncDesktopManagerCallback").Bind(this._desktopManager, callbackFunctionName, A_Index -1)
+			Hotkey, % "*" (A_index -1), % callback, On ;if the user has already pressed win + tab then numbers quicly change desktops
+		}
+		Hotkey, If
 		
 		return this
 	}
@@ -53,15 +88,8 @@ class JPGIncHotkeyManager
 	 * If the modifier key used is only a modifier symbol then we don't need to do anything (https://autohotkey.com/docs/Hotkeys.htm#Symbols)
 	 * but if it contains any other characters then it means that the hotkey is a combination hotkey then we need to add " & " 
 	 */
-	_fixModKeysForHotkeySyntax(options) 
+	_doesHotkeyRequireCustomHotkeySyntax(key)
 	{
-		if(RegExMatch(options[this._optionsMoveWindowHotkey], this._notAnAutohotkeyModKeyRegex)) {
-			options[this._optionsMoveWindowHotkey] .= " & "
-		}
-		
-		if(RegExMatch(options[this._optionsChangeVirtualDesktopHotkey], this._notAnAutohotkeyModKeyRegex)) {
-			options[this._optionsChangeVirtualDesktopHotkey] .= " & "
-		}
-		return options
+		return RegExMatch(key, this._notAnAutohotkeyModKeyRegex)
 	}
 }
