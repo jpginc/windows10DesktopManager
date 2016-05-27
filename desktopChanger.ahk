@@ -1,67 +1,16 @@
-JPGIncDesktopManagerCallback(desktopManager, functionName, keyPressed)
-{
-	if(keyPressed == 0) 
-	{
-		keyPressed := 10
-	}
-	desktopManager[functionName](keyPressed)
-	return
-}
-
 class JPGIncDesktopManagerClass
-{
-	notAnAutohotkeyModKeyRegex := "[^#!^+<>*~$]"
-	moveWinMod := "moveWindowModKey"
-	changeVDMod := "goToDesktopModKey"
-		
+{		
 	__new(options) 
 	{
 		this.options := options
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
 		this.monitorMapper := new MonitorMapperClass()
+		this.hotkeyManager := new JPGIncHotkeyManager(this)
 		
-		this.mapHotkeys()
+		this.hotkeyManager.setupHotkeys(this.options)
 		return this
 	}
-	
-	mapHotkeys()
-	{
-		this.fixModKeysForHotkeySyntax()
-		loop, 10
-		{
-			moveCallback := Func("JPGIncDesktopManagerCallback").Bind(this, "moveActiveWindowToDesktop", A_Index - 1)
-			changeCallback := Func("JPGIncDesktopManagerCallback").Bind(this, "goToDesktop", A_Index -1)
-			Hotkey, If
-			if(this.options[this.moveWinMod]) 
-			{
-				Hotkey, % this.options[this.moveWinMod] (A_index -1), % moveCallback
-			}
-			if(this.options[this.changeVDMod]) 
-			{
-				Hotkey, % this.options[this.changeVDMod] (A_index -1), % changeCallback
-			}
-			
-			Hotkey, IfWinActive, ahk_class MultitaskingViewFrame
-			Hotkey, % "*" (A_index -1), % changeCallback ;if the user has already pressed win + tab then numbers quicly change desktops
-		}
-		return this
-	}
-	
-	/*
-	 * If the modifier key used is only a modifier symbol then we don't need to do anything (https://autohotkey.com/docs/Hotkeys.htm#Symbols)
-	 * but if it contains any other characters then it means that the hotkey is a combination hotkey then we need to add " & " 
-	 */
-	fixModKeysForHotkeySyntax() 
-	{
-		if(RegExMatch(this.options[this.moveWinMod], this.notAnAutohotkeyModKeyRegex)) {
-			this.options[this.moveWinMod] .= " & "
-		}
-		
-		if(RegExMatch(this.options[this.changeVDMod], this.notAnAutohotkeyModKeyRegex)) {
-			this.options[this.changeVDMod] .= " & "
-		}
-		return this
-	}
+
 	/*
 	 *	swap to the given virtual desktop number
 	 */

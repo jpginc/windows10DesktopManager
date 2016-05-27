@@ -41,6 +41,7 @@ afterDesktopChangeTurnOffCapslock()
 #Include desktopMapper.ahk
 #include virtualDesktopManager.ahk
 #Include monitorMapper.ahk
+#Include hotkeyManager.ahk
 
 debugger(message) 
 {
