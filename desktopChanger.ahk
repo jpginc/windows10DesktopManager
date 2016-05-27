@@ -5,15 +5,19 @@ class JPGIncDesktopManagerClass
 	
 	goToDesktopCallbackFunctionName := "goToDesktop"
 	moveActiveWindowToDesktopFunctionName := "moveActiveWindowToDesktop"
+
+	_postMoveWindowFunctionName := ""
+	_postGoToDesktopFunctionName := ""
 	
 	__new(options := "") 
 	{
-		this.options := options
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
 		this.monitorMapper := new MonitorMapperClass()
 		this.hotkeyManager := new JPGIncHotkeyManager(this)
 		
 		this._setupHotkeysFromOptions(options)
+		this.afterGoToDesktopHotkey(options.postChangeDesktop)
+		this.afterMoveWindowToDesktopHotkey(options.postChangeDesktop)
 		return this
 	}
 	
@@ -28,6 +32,19 @@ class JPGIncDesktopManagerClass
 		{
 			this.hotkeyManager.goToDesktopHotkey(options[this._optionsChangeVirtualDesktopHotkey])
 		}
+
+		return this
+	}
+	
+	afterGoToDesktopHotkey(functionLabelOrClassWithCallMethodName)
+	{
+		this._postGoToDesktopFunctionName := functionLabelOrClassWithCallMethodName
+		return this
+	}
+	
+	afterMoveWindowToDesktopHotkey(functionLabelOrClassWithCallMethodName)
+	{
+		this._postMoveWindowFunctionName := functionLabelOrClassWithCallMethodName
 		return this
 	}
 	
@@ -40,7 +57,7 @@ class JPGIncDesktopManagerClass
 		this._makeDesktopsIfRequired(newDesktopNumber)
 			._goToDesktop(newDesktopNumber)
 			.closeMultitaskingViewFrame()
-			.doPostMoveDesktop()
+			.doPostGoToDesktop()
 		return this
 	}
 	
@@ -105,15 +122,15 @@ class JPGIncDesktopManagerClass
 		return this
 	}
 	
-	doPostMoveDesktop() 
+	doPostGoToDesktop() 
 	{
-		this._callFunction(this.options.postChangeDesktop)
+		this._callFunction(this._postGoToDesktopFunctionName)
 		return this
 	}
 	
 	doPostMoveWindow() 
 	{
-		this._callFunction(this.options.postMoveWindow)
+		this._callFunction(this._postMoveWindowFunctionName)
 		return this
 	}
 	

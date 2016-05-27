@@ -21,16 +21,22 @@
  *		A function that will be called after moving the active window to a desktop
  * 	
  */
-options := {"goToDesktopModKey" : "Capslock" ;capslock + number number jumps to desktop
-	,"moveWindowModKey" : "+#" ;windows key + shift + number moves the active window to a desktop
-	,"postChangeDesktop" : Func("afterDesktopChangeTurnOffCapslock").bind()} ;after moving the active window turn off capslock
+;~ options := {"goToDesktopModKey" : "Capslock" ;capslock + number number jumps to desktop
+	;~ ,"moveWindowModKey" : "+#" ;windows key + shift + number moves the active window to a desktop
+	;~ ,"postChangeDesktop" : Func("afterDesktopChangeTurnOffCapslock").bind()} ;after moving the active window turn off capslock
 	
-globalDesktopManager := new JPGIncDesktopManagerClass(options)
+;~ globalDesktopManager := new JPGIncDesktopManagerClass(options)
 
-;~ change the got to desktop hotkey from capslock (which was set in the options above) to just the windows key
-;~ globalDesktopManager.hotkeyManager.goToDesktopHotkey("#")
+ /*
+  * Alternatively you can use the hotkeyManager to set the hotkeys after the JPGIncDesktopManagerClass has been
+  * constructed like this
+  */
+globalDesktopManager := new JPGIncDesktopManagerClass()
+globalDesktopManager.hotkeyManager.goToDesktopHotkey("Capslock")
+globalDesktopManager.hotkeyManager.moveWindowToDesktopHotkey("+#")
+globalDesktopManager.afterGoToDesktopHotkey("afterDesktopChangeTurnOffCapslock")
+
 return
-
 
 afterDesktopChangeTurnOffCapslock()
 {
