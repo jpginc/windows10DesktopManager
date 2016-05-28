@@ -10,8 +10,31 @@ class JPGIncDesktopManagerClass
 	{
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
 		this.monitorMapper := new MonitorMapperClass()
-		this.hotkeyManager := new JPGIncHotkeyManager(this)
-
+		this.hotkeyManager := new JPGIncHotkeyManager()
+		
+		this._setupDefaultHotkeys()
+		return this
+	}
+	
+	_setupDefaultHotkeys()
+	{
+		Hotkey, IfWinActive, ahk_class MultitaskingViewFrame
+		this.hotkeyManager.setupNumberedHotkey(this, this.goToDesktopCallbackFunctionName, "")
+		Hotkey, If
+		return this
+	}
+	
+	/*
+	 * Public API to setup virtual desktop hotkeys and callbacks
+	 */
+	setGoToDesktop(hotkeyKey)
+	{
+		this.hotkeyManager.setupNumberedHotkey(this, this.goToDesktopCallbackFunctionName, hotkeyKey)
+		return this
+	}
+	setMoveWindowToDesktop(hotkeyKey)
+	{
+		this.hotkeyManager.setupNumberedHotkey(this, this.moveActiveWindowToDesktopFunctionName, hotkeyKey)
 		return this
 	}
 	
@@ -32,6 +55,7 @@ class JPGIncDesktopManagerClass
 	 */
 	goToDesktop(newDesktopNumber) 
 	{
+		newDesktopNumber := this._getDesktopNumberFromHotkey(newDesktopNumber)
 		debugger("in go to desktop changing to " newDesktopNumber)
 		this._makeDesktopsIfRequired(newDesktopNumber)
 			._goToDesktop(newDesktopNumber)
@@ -171,5 +195,9 @@ class JPGIncDesktopManagerClass
 			}
 		}
 		return false
+	}
+	_getDesktopNumberFromHotkey(keyCombo)
+	{
+		return RegExReplace(keyCombo, "[^\d]", "")
 	}
 }

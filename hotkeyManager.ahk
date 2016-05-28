@@ -1,86 +1,39 @@
 /* 
- * this function is used when a hotkey combo is pressed. It directs the program to the appropriate function in the desktop manager
+ * this function is used when a hotkey combo is pressed. It directs the program to the appropriate function in the appropriate class
  */ 
-JPGIncDesktopManagerCallback(desktopManager, functionName, keyPressed)
+JPGIncDesktopManagerCallback(desktopManager, functionName, keyCombo)
 {
-	if(keyPressed == 0) 
-	{
-		keyPressed := 10
-	}
-	desktopManager[functionName](keyPressed)
+	desktopManager[functionName](keyCombo)
 	return
 }
 
 class JPGIncHotkeyManager
 {
 	_notAnAutohotkeyModKeyRegex := "[^#!^+<>*~$]"
-	_desktopManager := ""
-	
-	_hotkeys := {}
-	
-	__new(desktopManager) 
+
+	__new() 
 	{
-		this._desktopManager := desktopManager
 		return this
 	}
-	
-	goToDesktopHotkey(hotkeyKey) 
+
+	setupNumberedHotkey(callbackClass, callbackFunctionName, hotkeyKey)
 	{
-		callbackName := this._desktopManager.goToDesktopCallbackFunctionName
-		return this._setupHotkey(callbackName, hotkeyKey)
-	}
-	
-	moveWindowToDesktopHotkey(hotkeyKey)
-	{
-		callbackName := this._desktopManager.moveActiveWindowToDesktopFunctionName
-		return this._setupHotkey(callbackName, hotkeyKey)
-	}
-	
-	_setupHotkey(callbackFunctionName, hotkeyKey)
-	{
-		if(this._doesHotkeyRequireCustomHotkeySyntax(hotkeyKey)) 
+		if(this._doesHotkeyRequireCustomHotkeySyntax(hotkeyKey))
 		{
 			hotkeyKey .= " & "
 		}
-		
-		;remove the old keybindings and save the new keybinding
-		this._removeHotkey(callbackFunctionName)
-		this._hotkeys[callbackFunctionName] := hotkeyKey
-		
-		loop, 10
+		Loop, 10
 		{
-			callback := Func("JPGIncDesktopManagerCallback").Bind(this._desktopManager, callbackFunctionName, A_Index -1)
-			Hotkey, % hotkeyKey (A_index -1), % callback, On
-		}
-		
-		return this
-	}
-	
-	_removeHotkey(hotkeyIndex) 
-	{
-		hotkeyKey := this._hotkeys[hotkeyIndex]
-		if(hotkeyKey)
-		{
-			loop, 10
-			{
-				Hotkey, % hotkeyKey (A_index -1), Off
-			}
+			this.setupHotkey(callbackClass, callbackFunctionName, hotkeyKey (A_Index - 1))
 		}
 		return this
 	}
 	
-	setupDefaultHotkeys() 
+	setupHotkey(callbackClass, callbackFunctionName, hotkeyKey)
 	{
-		callbackFunctionName := this._desktopManager.goToDesktopCallbackFunctionName
-		
-		Hotkey, IfWinActive, ahk_class MultitaskingViewFrame
-		loop, 10
-		{
-			callback := Func("JPGIncDesktopManagerCallback").Bind(this._desktopManager, callbackFunctionName, A_Index -1)
-			Hotkey, % "*" (A_index -1), % callback, On ;if the user has already pressed win + tab then numbers quicly change desktops
-		}
-		Hotkey, If
-		
+		;~ debugger("Setting up callback: " callbackFunctionName " as " hotkeyKey)
+		callback := Func("JPGIncDesktopManagerCallback").Bind(callbackClass, callbackFunctionName, hotkeyKey)
+		Hotkey, % hotkeyKey, % callback, On
 		return this
 	}
 	

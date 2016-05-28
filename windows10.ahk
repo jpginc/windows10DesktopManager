@@ -4,9 +4,9 @@
   * constructed like this
   */
 globalDesktopManager := new JPGIncDesktopManagerClass()
-globalDesktopManager.hotkeyManager.goToDesktopHotkey("Capslock")
-globalDesktopManager.hotkeyManager.moveWindowToDesktopHotkey("+#")
-globalDesktopManager.afterGoToDesktop("afterDesktopChangeTurnOffCapslock")
+globalDesktopManager.setGoToDesktop("Capslock")
+    .setMoveWindowToDesktop("+#")
+    .afterGoToDesktop("afterDesktopChangeTurnOffCapslock")
 
 return
 
@@ -27,6 +27,6 @@ afterDesktopChangeTurnOffCapslock()
 debugger(message) 
 {
 	;~ ToolTip, % message
-	;~ sleep 10
+	;~ sleep 100
 	return
 }
