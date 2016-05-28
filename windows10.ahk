@@ -7,6 +7,8 @@ globalDesktopManager := new JPGIncDesktopManagerClass()
 globalDesktopManager.setGoToDesktop("Capslock")
     .setMoveWindowToDesktop("+#")
     .afterGoToDesktop("afterDesktopChangeTurnOffCapslock")
+    .setGoToNextDesktop("Capslock & w")
+    .setGoToPreviousDesktop("Capslock & q")
 
 return
 

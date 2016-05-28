@@ -2,7 +2,9 @@ class JPGIncDesktopManagerClass
 {
 	goToDesktopCallbackFunctionName := "goToDesktop"
 	moveActiveWindowToDesktopFunctionName := "moveActiveWindowToDesktop"
-
+	nextDesktopFunctionName := "goToNextDesktop"
+	PreviousDesktopFunctionName := "goToPreviousDesktop"
+	
 	_postMoveWindowFunctionName := ""
 	_postGoToDesktopFunctionName := ""
 	
@@ -38,6 +40,18 @@ class JPGIncDesktopManagerClass
 		return this
 	}
 	
+	setGoToNextDesktop(hotkeyKey)
+	{
+		this.hotkeyManager.setupHotkey(this, this.nextDesktopFunctionName, hotkeyKey)
+		return this
+	}
+	
+	setGoToPreviousDesktop(hotkeyKey)
+	{
+		this.hotkeyManager.setupHotkey(this, this.PreviousDesktopFunctionName, hotkeyKey)
+		return this
+	}
+	
 	afterGoToDesktop(functionLabelOrClassWithCallMethodName)
 	{
 		this._postGoToDesktopFunctionName := functionLabelOrClassWithCallMethodName
@@ -48,6 +62,16 @@ class JPGIncDesktopManagerClass
 	{
 		this._postMoveWindowFunctionName := functionLabelOrClassWithCallMethodName
 		return this
+	}
+	
+	goToNextDesktop(keyCombo := "")
+	{
+		return this._send("^#{right}")
+	}
+	
+	goToPreviousDesktop(keyCombo := "")
+	{
+		return this._send("^#{left}")
 	}
 	
 	/*
