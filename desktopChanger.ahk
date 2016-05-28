@@ -1,37 +1,16 @@
 class JPGIncDesktopManagerClass
-{		
-	_optionsMoveWindowHotkey := "moveWindowModKey"
-	_optionsChangeVirtualDesktopHotkey := "goToDesktopModKey"
-	
+{
 	goToDesktopCallbackFunctionName := "goToDesktop"
 	moveActiveWindowToDesktopFunctionName := "moveActiveWindowToDesktop"
 
 	_postMoveWindowFunctionName := ""
 	_postGoToDesktopFunctionName := ""
 	
-	__new(options := "") 
+	__new() 
 	{
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
 		this.monitorMapper := new MonitorMapperClass()
 		this.hotkeyManager := new JPGIncHotkeyManager(this)
-		
-		this._setupHotkeysFromOptions(options)
-		this.afterGoToDesktopHotkey(options.postChangeDesktop)
-		this.afterMoveWindowToDesktopHotkey(options.postChangeDesktop)
-		return this
-	}
-	
-	_setupHotkeysFromOptions(options) 
-	{
-		this.hotkeyManager.setupDefaultHotkeys()
-		if(options[this._optionsMoveWindowHotkey])
-		{
-			this.hotkeyManager.moveWindowToDesktopHotkey(options[this._optionsMoveWindowHotkey])
-		}
-		if(options[this._optionsChangeVirtualDesktopHotkey])
-		{
-			this.hotkeyManager.goToDesktopHotkey(options[this._optionsChangeVirtualDesktopHotkey])
-		}
 
 		return this
 	}
