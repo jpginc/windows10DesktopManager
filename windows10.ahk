@@ -20,13 +20,14 @@ afterDesktopChangeTurnOffCapslock()
 
 #c::ExitApp
 
-#include desktopManager.ahk
+#Include desktopManager.ahk
 #Include desktopChanger.ahk
+#Include windowMover.ahk
 #Include desktopMapper.ahk
 #include virtualDesktopManager.ahk
 #Include monitorMapper.ahk
 #Include hotkeyManager.ahk
-
+#Include commonFunctions.ahk
 debugger(message) 
 {
 	;~ ToolTip, % message

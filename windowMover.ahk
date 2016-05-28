@@ -1,0 +1,52 @@
+﻿class JPGIncWindowMoverClass
+{
+	moveActiveWindowToDesktopFunctionName := "moveActiveWindowToDesktop"
+	_postMoveWindowFunctionName := ""
+	
+	__new()
+	{
+		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
+		this.monitorMapper := new MonitorMapperClass()
+		return this
+	}
+	
+	doPostMoveWindow() 
+	{
+		callFunction(this._postMoveWindowFunctionName)
+		return this
+	}
+	
+	moveActiveWindowToDesktop(targetDesktop, follow := false)
+	{
+		currentDesktop := this.desktopMapper.getDesktopNumber()
+		if(currentDesktop == targetDesktop) 
+		{
+			return this
+		}
+		numberOfTabsNeededToSelectActiveMonitor := this.monitorMapper.getRequiredTabCount(WinActive("A"))
+		numberOfDownsNeededToSelectDesktop := this.getNumberOfDownsNeededToSelectDesktop(targetDesktop, currentDesktop)
+		
+		openMultitaskingViewFrame()
+		send("{tab " numberOfTabsNeededToSelectActiveMonitor "}")
+		send("{Appskey}m{Down " numberOfDownsNeededToSelectDesktop "}{Enter}")
+		closeMultitaskingViewFrame()
+		this.doPostMoveWindow()
+		
+		return	this
+	}
+	
+	
+	getNumberOfDownsNeededToSelectDesktop(targetDesktop, currentDesktop)
+	{
+		; This part figures out how many times we need to push down within the context menu to get the desktop we want.	
+		if (targetDesktop > currentDesktop)
+		{
+			targetDesktop -= 2
+		}
+		else
+		{
+			targetdesktop--
+		}
+		return targetDesktop
+	}
+}

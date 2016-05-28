@@ -3,6 +3,7 @@
 	__new()
 	{
 		this._desktopChanger := new JPGIncDesktopChangerClass()
+		this._windowMover := new JPGIncWindowMoverClass()
 		this.hotkeyManager := new JPGIncHotkeyManager()
 		
 		this._setupDefaultHotkeys()
@@ -19,7 +20,7 @@
 	}
 	setMoveWindowToDesktop(hotkeyKey)
 	{
-		this.hotkeyManager.setupNumberedHotkey(this._desktopChanger, this._desktopChanger.moveActiveWindowToDesktopFunctionName, hotkeyKey)
+		this.hotkeyManager.setupNumberedHotkey(this._windowMover, this._windowMover.moveActiveWindowToDesktopFunctionName, hotkeyKey)
 		return this
 	}
 	
@@ -37,13 +38,13 @@
 	
 	afterGoToDesktop(functionLabelOrClassWithCallMethodName)
 	{
-		this._postGoToDesktopFunctionName := functionLabelOrClassWithCallMethodName
+		this._desktopChanger.postGoToDesktopFunctionName := functionLabelOrClassWithCallMethodName
 		return this
 	}
 	
 	afterMoveWindowToDesktop(functionLabelOrClassWithCallMethodName)
 	{
-		this._postMoveWindowFunctionName := functionLabelOrClassWithCallMethodName
+		this._windowMover.postMoveWindowFunctionName := functionLabelOrClassWithCallMethodName
 		return this
 	}
 	
