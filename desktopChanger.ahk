@@ -13,12 +13,14 @@ class JPGIncDesktopChangerClass
 
 	goToNextDesktop(keyCombo := "")
 	{
-		return send("^#{right}")
+		send("^#{right}")
+		return this.doPostGoToDesktop()
 	}
 	
 	goToPreviousDesktop(keyCombo := "")
 	{
-		return send("^#{left}")
+		send("^#{left}")
+		return this.doPostGoToDesktop()
 	}
 	
 	/*
@@ -65,7 +67,17 @@ class JPGIncDesktopChangerClass
 	
 	doPostGoToDesktop() 
 	{
+		this._activateTopMostWindow()
 		callFunction(this.postGoToDesktopFunctionName)
+		return this
+	}
+	
+	_activateTopMostWindow()
+	{
+		If(WinActive("ahk_exe explorer.exe"))
+		{
+			send !{tab}
+		}
 		return this
 	}
 }
