@@ -20,6 +20,7 @@ afterDesktopChangeTurnOffCapslock()
 
 #c::ExitApp
 
+#include desktopManager.ahk
 #Include desktopChanger.ahk
 #Include desktopMapper.ahk
 #include virtualDesktopManager.ahk

@@ -1,4 +1,4 @@
-class JPGIncDesktopManagerClass
+class JPGIncDesktopChangerClass
 {
 	goToDesktopCallbackFunctionName := "goToDesktop"
 	moveActiveWindowToDesktopFunctionName := "moveActiveWindowToDesktop"
@@ -12,58 +12,9 @@ class JPGIncDesktopManagerClass
 	{
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
 		this.monitorMapper := new MonitorMapperClass()
-		this.hotkeyManager := new JPGIncHotkeyManager()
-		
-		this._setupDefaultHotkeys()
 		return this
 	}
-	
-	_setupDefaultHotkeys()
-	{
-		Hotkey, IfWinActive, ahk_class MultitaskingViewFrame
-		this.hotkeyManager.setupNumberedHotkey(this, this.goToDesktopCallbackFunctionName, "")
-		Hotkey, If
-		return this
-	}
-	
-	/*
-	 * Public API to setup virtual desktop hotkeys and callbacks
-	 */
-	setGoToDesktop(hotkeyKey)
-	{
-		this.hotkeyManager.setupNumberedHotkey(this, this.goToDesktopCallbackFunctionName, hotkeyKey)
-		return this
-	}
-	setMoveWindowToDesktop(hotkeyKey)
-	{
-		this.hotkeyManager.setupNumberedHotkey(this, this.moveActiveWindowToDesktopFunctionName, hotkeyKey)
-		return this
-	}
-	
-	setGoToNextDesktop(hotkeyKey)
-	{
-		this.hotkeyManager.setupHotkey(this, this.nextDesktopFunctionName, hotkeyKey)
-		return this
-	}
-	
-	setGoToPreviousDesktop(hotkeyKey)
-	{
-		this.hotkeyManager.setupHotkey(this, this.PreviousDesktopFunctionName, hotkeyKey)
-		return this
-	}
-	
-	afterGoToDesktop(functionLabelOrClassWithCallMethodName)
-	{
-		this._postGoToDesktopFunctionName := functionLabelOrClassWithCallMethodName
-		return this
-	}
-	
-	afterMoveWindowToDesktop(functionLabelOrClassWithCallMethodName)
-	{
-		this._postMoveWindowFunctionName := functionLabelOrClassWithCallMethodName
-		return this
-	}
-	
+
 	goToNextDesktop(keyCombo := "")
 	{
 		return this._send("^#{right}")
