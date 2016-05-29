@@ -48,6 +48,18 @@
 		return this
 	}
 	
+	setCloseDesktop(hotkeyKey)
+	{
+		this.hotkeyManager.setupHotkey(this, "closeDesktop", hotkeyKey)
+		return this
+	}
+	
+	setNewDesktop(hotkeyKey)
+	{
+		this.hotkeyManager.setupHotkey(this, "newDesktop", hotkeyKey)
+		return this
+	}
+	
 	afterGoToDesktop(functionLabelOrClassWithCallMethodName)
 	{
 		this._desktopChanger.postGoToDesktopFunctionName := functionLabelOrClassWithCallMethodName
@@ -63,7 +75,19 @@
 	/*
 	 * end public api
 	 */
-	 
+	
+	newDesktop(hotkeyCombo := "")
+	{
+		send("^#d")
+		return this
+	}
+	
+	closeDesktop(hotkeyCombo := "")
+	{
+		send("^#{f4}")
+		return this
+	}
+	
 	_setupDefaultHotkeys()
 	{
 		Hotkey, IfWinActive, ahk_class MultitaskingViewFrame

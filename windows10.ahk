@@ -12,6 +12,8 @@ globalDesktopManager.setGoToDesktop("Capslock")
     .setGoToPreviousDesktop("Capslock & q")
     .setMoveWindowToNextDesktop("Capslock & s")
     .setMoveWindowToPreviousDesktop("Capslock & a")
+	;~ .setCloseDesktop("Capslock & x")
+	;~ .setNewDesktop("Capslock & n")
 
 return
 
