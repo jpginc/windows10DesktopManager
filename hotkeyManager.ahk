@@ -3,7 +3,7 @@
  */ 
 JPGIncDesktopManagerCallback(desktopManager, functionName, keyCombo)
 {
-	desktopManager[functionName](keyCombo)
+	desktopManager[functionName](getDesktopNumberFromHotkey(keyCombo))
 	return
 }
 

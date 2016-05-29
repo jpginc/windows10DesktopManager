@@ -28,7 +28,6 @@ class JPGIncDesktopChangerClass
 	 */
 	goToDesktop(newDesktopNumber) 
 	{
-		newDesktopNumber := getDesktopNumberFromHotkey(newDesktopNumber)
 		debugger("in go to desktop changing to " newDesktopNumber)
 		this._makeDesktopsIfRequired(newDesktopNumber)
 			._goToDesktop(newDesktopNumber)
