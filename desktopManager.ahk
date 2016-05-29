@@ -36,6 +36,18 @@
 		return this
 	}
 	
+	setMoveWindowToNextDesktop(hotkeyKey)
+	{
+		this.hotkeyManager.setupHotkey(this._windowMover, this._windowMover.moveToNextFunctionName, hotkeyKey)
+		return this
+	}
+	
+	setMoveWindowToPreviousDesktop(hotkeyKey)
+	{
+		this.hotkeyManager.setupHotkey(this._windowMover, this._windowMover.moveToPreviousFunctionName, hotkeyKey)
+		return this
+	}
+	
 	afterGoToDesktop(functionLabelOrClassWithCallMethodName)
 	{
 		this._desktopChanger.postGoToDesktopFunctionName := functionLabelOrClassWithCallMethodName

@@ -1,6 +1,8 @@
 ﻿class JPGIncWindowMoverClass
 {
 	moveActiveWindowToDesktopFunctionName := "moveActiveWindowToDesktop"
+	moveToNextFunctionName := "moveActiveWindowToNextDesktop"
+	moveToPreviousFunctionName := "moveActiveWindowToPreviousDesktop"
 	_postMoveWindowFunctionName := ""
 	
 	__new()
@@ -35,6 +37,21 @@
 		return	this
 	}
 	
+	moveActiveWindowToNextDesktop(follow := false)
+	{
+		currentDesktop := this.desktopMapper.getDesktopNumber()
+		return this.moveActiveWindowToDesktop(currentDesktop + 1, follow)
+	}
+	
+	moveActiveWindowToPreviousDesktop(follow := false)
+	{
+		currentDesktop := this.desktopMapper.getDesktopNumber()
+		if(currentDesktop == 1) 
+		{
+			return this
+		}
+		return this.moveActiveWindowToDesktop(currentDesktop - 1, follow)
+	}	
 	
 	getNumberOfDownsNeededToSelectDesktop(targetDesktop, currentDesktop)
 	{
