@@ -50,7 +50,8 @@ callFunction(possibleFunction)
 
 getDesktopNumberFromHotkey(keyCombo)
 {
-	return RegExReplace(keyCombo, "[^\d]", "")
+	number := RegExReplace(keyCombo, "[^\d]", "")
+	return number == 0 ? 10 : number
 }
 
 getIndexFromArray(searchFor, array) 
