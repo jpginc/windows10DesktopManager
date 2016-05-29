@@ -1,6 +1,14 @@
 ﻿turnCapslockOff()
 {
-	SetCapsLockState , Off
+	;if the capslock key is down then set the capslock state to on so that
+	;when the user lets go it will change the state to off
+	if(GetKeyState("Capslock", "P"))
+	{
+		SetCapsLockState, On
+	} else
+	{
+		SetCapsLockState , Off
+	}
 	return
 }
 
