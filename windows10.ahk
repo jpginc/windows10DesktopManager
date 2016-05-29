@@ -6,17 +6,11 @@
 globalDesktopManager := new JPGIncDesktopManagerClass()
 globalDesktopManager.setGoToDesktop("Capslock")
     .setMoveWindowToDesktop("+#")
-    .afterGoToDesktop("afterDesktopChangeTurnOffCapslock")
+    .afterGoToDesktop("turnCapslockOff")
     .setGoToNextDesktop("Capslock & w")
     .setGoToPreviousDesktop("Capslock & q")
 
 return
-
-afterDesktopChangeTurnOffCapslock()
-{
-	SetCapsLockState , Off
-	return
-}
 
 #c::ExitApp
 

@@ -1,4 +1,10 @@
-﻿/*
+﻿turnCapslockOff()
+{
+	SetCapsLockState , Off
+	return
+}
+
+/*
  * If we send the keystrokes too quickly you sometimes get a flickering of the screen
  */
 send(toSend)
