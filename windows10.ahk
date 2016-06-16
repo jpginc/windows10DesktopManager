@@ -27,3 +27,4 @@ return
 #Include monitorMapper.ahk
 #Include hotkeyManager.ahk
 #Include commonFunctions.ahk
+#Include dllWindowMover.ahk
