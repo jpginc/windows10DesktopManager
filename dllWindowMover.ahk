@@ -11,14 +11,30 @@
 			debugger("the scripts to run the dll's are already running")
 			return this
 		}
+		
+		this._startUpDllInjectors()
+		return this
+	}
+	
+	_startUpDllInjectors()
+	{
 		myPID := DllCall("GetCurrentProcessId")
-		run, AutoHotkeyU32.exe "injection dll/dllCaller.ahk" "%myPID%" "32", , , 32BitPID
-		run, AutoHotkeyU64.exe "injection dll/dllCaller.ahk" %myPID% 64, , , 64BitPID
+		run, AutoHotkeyU32.exe "injection dll/dllCaller.ahk" "%myPID%" "32", , useerrorlevel, 32BitPID
+		if(ErrorLevel == "ERROR")
+		{
+			debugger("There was an error running the 32 bit dll injector!`nWindows error code is: " A_LastError)
+		}
+		
+		run, AutoHotkeyU64.exe "injection dll/dllCaller.ahk" %myPID% 64, , useerrorlevel, 64BitPID
+		if(ErrorLevel == "ERROR")
+		{
+			debugger("There was an error running the 64 bit dll injector!`nWindows error code is: " A_LastError)
+		}
 		
 		debugger( "32 bit pid is " 32BitPID "`n64bit pid is " 64BitPID)
 		this.32BitPID := 32BitPID
 		this.64BitPID := 64BitPID
-		return this
+		return
 	}
 	
 	isAvailable()
