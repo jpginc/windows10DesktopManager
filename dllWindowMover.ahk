@@ -50,8 +50,8 @@
 	{
 		desktopNumber-- ;the dll numbers windows from 0 this is wParam
 		hwnd := WinExist("A")
-		
-		wParam := desktopNumber
+		marker := 43968 ; 0xABC0
+		wParam := desktopNumber | marker
 		lParam := hwnd
 		WM_SYSCOMMAND := 274
 		debugger("moving " hwnd " to desktop " desktopNumber)
