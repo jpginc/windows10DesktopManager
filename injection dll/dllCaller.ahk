@@ -1,4 +1,6 @@
-﻿parentPID = %1%
+﻿#NoTrayIcon
+
+parentPID = %1%
 32Or64 = %2%
 SetWorkingDir, % A_ScriptDir
 if(parentPID && 32Or64)
