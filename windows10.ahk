@@ -27,9 +27,4 @@ return
 #Include monitorMapper.ahk
 #Include hotkeyManager.ahk
 #Include commonFunctions.ahk
-debugger(message) 
-{
-	;~ ToolTip, % message
-	;~ sleep 100
-	return
-}
+#Include dllWindowMover.ahk

@@ -1,4 +1,11 @@
-﻿turnCapslockOff()
+﻿debugger(message) 
+{
+	;~ ToolTip, % message
+	;~ sleep 100
+	return
+}
+
+turnCapslockOff()
 {
 	;if the capslock key is down then set the capslock state to on so that
 	;when the user lets go it will change the state to off

@@ -7,6 +7,7 @@
 	
 	__new()
 	{
+		this.dllWindowMover := new JPGIncDllWindowMover()
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
 		this.monitorMapper := new MonitorMapperClass()
 		return this
@@ -20,18 +21,25 @@
 	
 	moveActiveWindowToDesktop(targetDesktop, follow := false)
 	{
-		currentDesktop := this.desktopMapper.getDesktopNumber()
-		if(currentDesktop == targetDesktop) 
+		if(this.dllWindowMover.isAvailable()) 
 		{
-			return this
+			this.dllWindowMover.moveActiveWindowToDesktop(targetDesktop)
+		} else 
+		{
+			currentDesktop := this.desktopMapper.getDesktopNumber()
+			if(currentDesktop == targetDesktop) 
+			{
+				return this
+			}
+			numberOfTabsNeededToSelectActiveMonitor := this.monitorMapper.getRequiredTabCount(WinActive("A"))
+			numberOfDownsNeededToSelectDesktop := this.getNumberOfDownsNeededToSelectDesktop(targetDesktop, currentDesktop)
+			
+			openMultitaskingViewFrame()
+			send("{tab " numberOfTabsNeededToSelectActiveMonitor "}")
+			send("{Appskey}m{Down " numberOfDownsNeededToSelectDesktop "}{Enter}")
+			closeMultitaskingViewFrame()
 		}
-		numberOfTabsNeededToSelectActiveMonitor := this.monitorMapper.getRequiredTabCount(WinActive("A"))
-		numberOfDownsNeededToSelectDesktop := this.getNumberOfDownsNeededToSelectDesktop(targetDesktop, currentDesktop)
 		
-		openMultitaskingViewFrame()
-		send("{tab " numberOfTabsNeededToSelectActiveMonitor "}")
-		send("{Appskey}m{Down " numberOfDownsNeededToSelectDesktop "}{Enter}")
-		closeMultitaskingViewFrame()
 		this.doPostMoveWindow()
 		
 		return	this
