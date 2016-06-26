@@ -28,3 +28,4 @@ return
 #Include hotkeyManager.ahk
 #Include commonFunctions.ahk
 #Include dllWindowMover.ahk
+#Include virtualDesktopManagerInternal.ahk

@@ -8,6 +8,7 @@ class JPGIncDesktopChangerClass
 	__new() 
 	{
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
+		this.virtualDesktopManagerInternal := new VirtualDesktopManagerInternalClass()
 		return this
 	}
 
@@ -49,18 +50,7 @@ class JPGIncDesktopChangerClass
 
 	_goToDesktop(newDesktopNumber)
 	{
-		currentDesktop := this.desktopMapper.getDesktopNumber()
-		direction := currentDesktop - newDesktopNumber
-		distance := Abs(direction)
-		debugger("distance to move is " distance "`ndirectin" direction)
-		if(direction < 0)
-		{
-			debugger("Sending right! " distance "times")
-			send("^#{right " distance "}")
-		} else
-		{
-			send("^#{left " distance "}")
-		}
+		this.virtualDesktopManagerInternal.goToDesktop(newDesktopNumber)
 		return this
 	}
 	
