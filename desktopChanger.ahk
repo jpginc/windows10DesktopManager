@@ -66,17 +66,8 @@ class JPGIncDesktopChangerClass
 	
 	doPostGoToDesktop() 
 	{
-		this._activateTopMostWindow()
+		activateTopMostWindowIfNoneActive()
 		callFunction(this.postGoToDesktopFunctionName)
-		return this
-	}
-	
-	_activateTopMostWindow()
-	{
-		If(WinActive("ahk_exe explorer.exe"))
-		{
-			send !{tab}
-		}
 		return this
 	}
 }

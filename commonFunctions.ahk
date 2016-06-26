@@ -1,4 +1,13 @@
-﻿debugger(message) 
+﻿activateTopMostWindowIfNoneActive()
+{
+	If(WinActive("ahk_exe explorer.exe"))
+	{
+		send !{tab}
+	}
+	return
+}
+
+debugger(message) 
 {
 	;~ ToolTip, % message
 	;~ sleep 100

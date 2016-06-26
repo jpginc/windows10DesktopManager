@@ -15,6 +15,7 @@
 	
 	doPostMoveWindow() 
 	{
+		activateTopMostWindowIfNoneActive()
 		callFunction(this._postMoveWindowFunctionName)
 		return this
 	}
