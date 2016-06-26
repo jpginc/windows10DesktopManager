@@ -8,6 +8,9 @@ An autohotkey desktop manager
 If you have moved to Windows 10 already then you have to make use of the new Virtual desktop environment! Unfortunately Windows is lacking a few keyboard shortcuts such as jumping to a specific desktop and moving programs to another desktop. 
 This script is designed to fill that hole by providing an easy way customisable hotkeys for all your virtual desktop managing needs. 
 
+###Requirements
+The script requires both a 32 and 64 bit version of the Autohotkey executable to reliably send windows to other desktops. Download the latest installer from the official Autohotkey website https://autohotkey.com/. The DLL's that are used to move windows to other desktops come from this project https://github.com/jpginc/MoveToDesktop
+
 ###Setup
 Clone this Repo and run windows10.ahk. Inside windows10.ahk is a default setup that you can use or edit. The JPGIncDesktopManagerClass has the following functions to setup hotkeys. Each of the following functions take a string representing a hotkey (see https://autohotkey.com/docs/Hotkeys.htm for more information about hotkeys). 
 
