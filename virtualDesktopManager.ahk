@@ -8,9 +8,9 @@
 		IID := "{a5cd92ff-29be-454c-8d04-d82879fb3f1b}" ;search IID_IVirtualDesktopManager
 		this.iVirtualDesktopManager := ComObjCreate(CLSID, IID)
 		
-		this.isWindowOnCurrentVirtualDesktopAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 3*A_PtrSize)
-		this.getWindowDesktopIdAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 4*A_PtrSize)
-		this.moveWindowToDesktopAddress := NumGet(NumGet(this.iVirtualDesktopManager+0), 5*A_PtrSize)
+		this.isWindowOnCurrentVirtualDesktopAddress := getComObjectFunctionAddress(this.iVirtualDesktopManager, 3)
+		this.getWindowDesktopIdAddress := getComObjectFunctionAddress(this.iVirtualDesktopManager, 4)
+		this.moveWindowToDesktopAddress := getComObjectFunctionAddress(this.iVirtualDesktopManager, 5)
 		
 		return this
 	}

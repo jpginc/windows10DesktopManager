@@ -1,4 +1,9 @@
-﻿activateTopMostWindowIfNoneActive()
+﻿getComObjectFunctionAddress(comObj, addressOffset) 
+{
+	return NumGet(NumGet(comObj+0), addressOffset * A_PtrSize)
+}
+
+activateTopMostWindowIfNoneActive()
 {
 	If(WinActive("ahk_exe explorer.exe"))
 	{
