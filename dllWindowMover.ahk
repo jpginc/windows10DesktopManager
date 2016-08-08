@@ -39,6 +39,14 @@
 	
 	isAvailable()
 	{
+		/*
+		 * according to this page we can't hook into cmd.exe 
+		 * http://microsoft.public.win32.programmer.tools.narkive.com/X4AmQ75v/setwindowshookex-failure-with-console-applications
+		 */
+		if(WinActive("ahk_class ConsoleWindowClass"))
+		{
+			return false
+		}
 		debugger("Checking availability")
 		if(! this.32BitPID || ! this.64BitPID)
 		{
