@@ -19,7 +19,7 @@ if(parentPID && 32Or64)
 	didTheCallSucceed := DllCall("user32.dll\SetWindowsHookEx", "Int", WH_GETMESSAGE, "Ptr", moveDesktopHookHandle, "Ptr", libraryHandle, "Ptr", 0)
 	if(! didTheCallSucceed)
 	{
-		MsgBox the call did not succeed for me`nLasError: %A_LastError%
+		MsgBox the call did not succeed for me`n A_LastError
 		ExitApp
 	}
 	Process, waitclose, % parentPID
