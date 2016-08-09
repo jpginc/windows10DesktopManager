@@ -72,6 +72,12 @@
 		return this
 	}
 	
+	followToDesktopAfterMovingWindow(bool)
+	{
+		this._windowMover.followToNewDesktop := bool
+		return this
+	}
+	
 	/*
 	 * end public api
 	 */

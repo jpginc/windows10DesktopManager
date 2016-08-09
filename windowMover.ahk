@@ -4,6 +4,7 @@
 	moveToNextFunctionName := "moveActiveWindowToNextDesktop"
 	moveToPreviousFunctionName := "moveActiveWindowToPreviousDesktop"
 	postMoveWindowFunctionName := ""
+	followToNewDesktop := false
 	
 	__new()
 	{
@@ -21,6 +22,7 @@
 	
 	moveActiveWindowToDesktop(targetDesktop, follow := false)
 	{
+		activeHwnd := WinExist("A")
 		if(this.dllWindowMover.isAvailable()) 
 		{
 			this.dllWindowMover.moveActiveWindowToDesktop(targetDesktop)
@@ -40,7 +42,8 @@
 			closeMultitaskingViewFrame()
 		}
 		
-		this.doPostMoveWindow()
+		this._followWindow(activeHwnd)
+			.doPostMoveWindow()
 		
 		return	this
 	}
@@ -73,5 +76,22 @@
 			targetdesktop--
 		}
 		return targetDesktop
+	}
+	
+	_followWindow(hwnd)
+	{
+		if(this.followToNewDesktop)
+		{
+			this._deActivateActiveWindow()
+			WinActivate, % "ahk_id " hwnd
+		}
+		return this
+	}
+	
+	_deActivateActiveWindow()
+	{
+		Gui, new
+		Gui, Show
+		Gui, destroy
 	}
 }
