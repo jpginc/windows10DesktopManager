@@ -3,7 +3,7 @@
 	moveActiveWindowToDesktopFunctionName := "moveActiveWindowToDesktop"
 	moveToNextFunctionName := "moveActiveWindowToNextDesktop"
 	moveToPreviousFunctionName := "moveActiveWindowToPreviousDesktop"
-	_postMoveWindowFunctionName := ""
+	postMoveWindowFunctionName := ""
 	
 	__new()
 	{
@@ -15,7 +15,7 @@
 	
 	doPostMoveWindow() 
 	{
-		callFunction(this._postMoveWindowFunctionName)
+		callFunction(this.postMoveWindowFunctionName)
 		return this
 	}
 	

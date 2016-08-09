@@ -3,7 +3,7 @@ class JPGIncDesktopChangerClass
 	goToDesktopCallbackFunctionName := "goToDesktop"
 	nextDesktopFunctionName := "goToNextDesktop"
 	PreviousDesktopFunctionName := "goToPreviousDesktop"
-	_postGoToDesktopFunctionName := ""
+	postGoToDesktopFunctionName := ""
 	
 	__new() 
 	{
