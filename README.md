@@ -25,7 +25,9 @@ The following functions take a hotkey that will be combined with numbers 0 - 9 f
 - setGoToDesktop(**hotkey**)
 - setMoveWindowToDesktop(**hotkey**)
 
-The last two functions accept either a function name, a label name, a class name with a "**call**" function on the class. It can also be a func object (https://autohotkey.com/docs/objects/Func.htm).
+These two functions accept either a function name, a label name, a class name with a "**call**" function on the class. It can also be a func object (https://autohotkey.com/docs/objects/Func.htm).
 - afterGoToDesktop(**name**)
 - afterMoveWindowToDesktop(**name**)
 
+You can also set the window manager to switch to the desktop after moving a window to it. By default you won't follow moving a window to another desktop.
+- followToDesktopAfterMovingWindow(**bool default is false**)
