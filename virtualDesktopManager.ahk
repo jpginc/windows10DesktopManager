@@ -75,18 +75,4 @@
 		}
 		return this
 	}
-	
-	getCurrentDesktop(hWnd) 
-	{
-		desktopId := ""
-		VarSetCapacity(desktopID, 16, 0)
-
-		Error := DllCall(this.getCurrentDesktopAddress, "Ptr", this.iVirtualDesktopManagerInternal, "Ptr", &desktopID)	
-		if(Error != 0) {
-			msgbox % "error in getWindowDesktopId " Error
-			clipboard := error
-		}
-
-		return &desktopID
-	}
 }
