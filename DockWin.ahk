@@ -138,7 +138,7 @@ SaveAllWindows()
 
     WinGetActiveTitle, SavedActiveWindow
 
-    file := FileOpen(FileName, "a")
+    file := FileOpen(FileName, "w")
     if !IsObject(file)
     {
         MsgBox, Can't open "%FileName%" for writing.
