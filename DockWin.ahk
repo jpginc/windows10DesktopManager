@@ -36,6 +36,10 @@ LoadAllWindows()
     ParmVals:="Title Desktop x y height width maximized path"
     SectionToFind:= this.SectionHeader()
     SectionFound:= 0
+    
+    FileSelectFile, FileName, 1, WinPos.txt ;ask when overwriting; default name WinPos.txt
+    MsgBox, 4, Dock Windows, Load window positions?
+    IfMsgBox, NO, Return
 
     Loop, Read, %FileName%
     {
@@ -133,9 +137,10 @@ SaveAllWindows()
     CrLf=`r`n
     FileName:="WinPos.txt"
 
+    FileSelectFile, FileName, 16, WinPos.txt ;ask when overwriting; default name WinPos.txt
     MsgBox, 4, Dock Windows, Save window positions?
     IfMsgBox, NO, Return
-
+    
     WinGetActiveTitle, SavedActiveWindow
 
     file := FileOpen(FileName, "w")
