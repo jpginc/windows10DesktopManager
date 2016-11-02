@@ -1,30 +1,87 @@
-﻿parentPID = %1%
+﻿SetWorkingDir, % A_ScriptDir
+parentPID = %1%
 32Or64 = %2%
-SetWorkingDir, % A_ScriptDir
-if(parentPID && 32Or64)
+libraryFileName := "hook " 32Or64 ".dll"
+
+validateArgsOrDie(parentPID, 32Or64)
+
+;load the custom dll
+libraryHandle := loadDllOrDie(libraryFileName)
+;get the address of the move desktop callback
+moveDesktopHookHandle := getHookHandleOrDie(libraryHandle)
+;hook up the move desktop callback on WH_GETMESSAGE messages
+setupMoveDesktopCallback(moveDesktopHookHandle, libraryHandle)
+waitForParentToClose(parentPID)
+ExitApp
+
+setupMoveDesktopCallback(functionHandle, libraryHandle)
 {
-	;~ MsgBox % parentPID "`n" 32Or64
-	
-	libraryFileName := "hook " 32Or64 ".dll"
-	
-	;~ MsgBox % libraryFileName
-	;load the custom dll
-	libraryHandle := DllCall("LoadLibrary", "Str", "hook " 32Or64 ".dll", "Ptr") 
-	;~ MsgBox % "libraryHandle " libraryHandle "`n" A_LastError
-	;get the address of the move desktop callback
-	moveDesktopHookHandle := DllCall("GetProcAddress", Ptr, libraryHandle, Astr, "GetMsgProc", "Ptr")
-	;~ MsgBox % "moveDesktopHookHandle " moveDesktopHookHandle "`n" A_LastError
-	;hook up the move desktop callback on WH_GETMESSAGE messages
 	WH_GETMESSAGE := 3 
-	didTheCallSucceed := DllCall("user32.dll\SetWindowsHookEx", "Int", WH_GETMESSAGE, "Ptr", moveDesktopHookHandle, "Ptr", libraryHandle, "Ptr", 0)
+	errorMessage := "Callback dll call did not succeed. Windows error code: "
+	
+	didTheCallSucceed := DllCall("user32.dll\SetWindowsHookEx", "Int", WH_GETMESSAGE, "Ptr", functionHandle, "Ptr", libraryHandle, "Ptr", 0)
 	if(! didTheCallSucceed)
 	{
-		MsgBox the call did not succeed for me`n A_LastError
-		ExitApp
+		alertErrorAndDie(errorMessage A_LastError)
 	}
-	Process, waitclose, % parentPID
-} else
-{
-	MsgBox Invalid command line args`nneed a process id and a string "64" or "32" %0% args were recieved
+	return
 }
-ExitApp
+getHookHandleOrDie(libraryHandle)
+{
+	errorMessage := "GetProcAddress dll call failed. Windows error code: "
+	handle := DllCall("GetProcAddress", Ptr, libraryHandle, Astr, "GetMsgProc", "Ptr")
+	if(! handle) 
+	{
+		alertErrorAndDie(errorMessage A_LastError)
+	}
+	return handle
+}
+loadDllOrDie(filename) 
+{
+	dllDoesNotExist := "Error, the dll does not exist!`nfilename: " filename
+	error126 := "Error, unable to load custom DLL. You may be missing VS 2013 runtime files`nThe download link has been copied to the clipboard`nYou must install BOTH the 32 and 64 bit libraries"
+	downloadLink := "https://www.microsoft.com/en-us/download/details.aspx?id=40784"
+	LoadLibraryFailed := "LoadLibrary DLL call failed with windows error code: "
+	
+	if(! FileExist(filename)) 
+	{
+		alertErrorAndDie(dllDoesNotExist)
+	}
+	handle :=  DllCall("LoadLibrary", "Str", filename, "Ptr") 
+	if(! handle) 
+	{
+		if(A_LastError == 126) 
+		{
+			Clipboard := downloadLink
+			alertErrorAndDie(error126)
+		}
+		alertErrorAndDie(LoadLibraryFailed A_LastError)
+	}
+	return handle
+}
+
+waitForParentToClose(parentPID) 
+{
+	Process, waitclose, % parentPID
+	return
+}
+
+validateArgsOrDie(parentPID, 32Or64)
+{
+	invalidCommandLineArgs := "Invalid command line args`nneed a process id and the string '64' or '32'"
+	if(! parentPid) 
+	{
+		alertErrorAndDie(invalidCommandLineArgs)
+	}
+	if(!(32Or64 == "32" || 32Or64 == "64")) 
+	{
+		alertErrorAndDie(invalidCommandLIneArgs)
+	}
+	return
+}
+
+alertErrorAndDie(msg) 
+{
+	MsgBox, % msg
+	ExitApp
+}
