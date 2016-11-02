@@ -1,4 +1,10 @@
 #SingleInstance
+if(! A_IsAdmin)
+{
+    ;dll calls window movers will not work without admin
+    Run *RunAs "%A_ScriptFullPath%"  ; Requires v1.0.92.01+
+    ExitApp
+}
  /*
   * Alternatively you can use the hotkeyManager to set the hotkeys after the JPGIncDesktopManagerClass has been
   * constructed like this
