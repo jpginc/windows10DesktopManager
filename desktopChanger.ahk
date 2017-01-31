@@ -73,7 +73,7 @@ class JPGIncDesktopChangerClass
 	
 	_activateTopMostWindow()
 	{
-		If(WinActive("ahk_exe explorer.exe"))
+		If(WinActive("ahk_exe explorer.exe") && ! WinActive("ahk_class CabinetWClass"))
 		{
 			send !{tab}
 		}
