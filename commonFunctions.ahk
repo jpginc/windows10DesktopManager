@@ -35,7 +35,7 @@ send(toSend)
 
 closeMultitaskingViewFrame()
 {
-	IfWinActive, ahk_class MultitaskingViewFrame
+	if(isMultiTaskingViewActive())
 	{
 		send("#{tab}")
 	}
@@ -45,7 +45,7 @@ closeMultitaskingViewFrame()
 	
 openMultitaskingViewFrame()
 {
-	IfWinNotActive, ahk_class MultitaskingViewFrame
+	if(! isMultiTaskingViewActive())
 	{
 		send("#{tab}")
 		WinWaitActive, ahk_class MultitaskingViewFrame
@@ -53,6 +53,10 @@ openMultitaskingViewFrame()
 	return
 }
 
+isMultiTaskingViewActive() 
+{
+	return WinActive("ahk_class MultitaskingViewFrame")
+}
 
 callFunction(possibleFunction)
 {
