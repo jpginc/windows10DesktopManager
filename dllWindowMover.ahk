@@ -6,18 +6,19 @@
 	__new()
 	{
 		debugger("starting the dll window mover")
-		if(this.isAvailable())
-		{
-			debugger("the scripts to run the dll's are already running")
-			return this
-		}
-		
 		this._startUpDllInjectors()
 		return this
 	}
 	
 	_startUpDllInjectors()
 	{
+		if(JPGIncDllWindowMover.32BitPID || JPGIncDllWindowMover.64BitPID)
+		{
+			debugger("the scripts to run the dll's are already running")
+			;can only have one instance of the dll injectors
+			return
+		}
+		
 		myPID := DllCall("GetCurrentProcessId")
 		run, AutoHotkeyU32.exe "injection dll/dllCaller.ahk" "%myPID%" "32", , useerrorlevel, 32BitPID
 		if(ErrorLevel == "ERROR")
@@ -32,8 +33,8 @@
 		}
 		
 		debugger( "32 bit pid is " 32BitPID "`n64bit pid is " 64BitPID)
-		this.32BitPID := 32BitPID
-		this.64BitPID := 64BitPID
+		JPGIncDllWindowMover.32BitPID := 32BitPID
+		JPGIncDllWindowMover.64BitPID := 64BitPID
 		return
 	}
 	
@@ -48,17 +49,17 @@
 			return false
 		}
 		debugger("Checking availability")
-		if(! this.32BitPID || ! this.64BitPID)
+		if(! JPGIncDllWindowMover.32BitPID || ! JPGIncDllWindowMover.64BitPID)
 		{
 			return false
 		}
-		process, exist, % this.32BitPID
+		process, exist, % JPGIncDllWindowMover.32BitPID
 		if(ErrorLevel == 0)
 		{
 			debugger("32 bit isn't available")
 			return false
 		}
-		process, exist, % this.64BitPID
+		process, exist, % JPGIncDllWindowMover.64BitPID
 		if(ErrorLevel == 0)
 		{
 			debugger("64 bit isn't available")
@@ -69,17 +70,26 @@
 	
 	/*
 	 * might return FAIL if the call fails?
-	 */
-	moveActiveWindowToDesktop(desktopNumber)
+	 */	
+	__makeDllCall(desktopNumber, hwnd)
 	{
-		desktopNumber-- ;the dll numbers windows from 0 this is wParam
-		hwnd := WinExist("A")
+		desktopNumber-- ;the dll starts desktop numbers at 0 not 1
 		marker := 43968 ; 0xABC0
-		wParam := desktopNumber | marker
+		wParam := desktopNUmber | marker
 		lParam := hwnd
 		WM_SYSCOMMAND := 274
 		debugger("moving " hwnd " to desktop " desktopNumber)
 		PostMessage, % WM_SYSCOMMAND , % wParam, % lParam, , % "ahk_id " hwnd
 		return ErrorLevel
+	}
+
+	moveActiveWindowToDesktop(desktopNumber)
+	{
+		return this.__makeDllCall(desktopNumber, WinExist("A"))
+	}
+	
+	moveWindowToDesktop(desktopNumber, windowHwnd)
+	{
+		return this.__makeDllCall(desktopNumber, windowHwnd)
 	}
 }
