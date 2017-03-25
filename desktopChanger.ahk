@@ -33,7 +33,6 @@ class JPGIncDesktopChangerClass
 		debugger("in go to desktop changing to " newDesktopNumber)
 		this._makeDesktopsIfRequired(newDesktopNumber)
 			._goToDesktop(newDesktopNumber)
-		closeMultitaskingViewFrame()
 		this.doPostGoToDesktop()
 		return this
 	}
@@ -87,10 +86,18 @@ class JPGIncDesktopChangerClass
 	
 	_activateTopMostWindow()
 	{
-		If(WinActive("ahk_exe explorer.exe"))
+		;if the desktop has focus before changing virtual desktops then the top most window isn't activated on the new desktop
+		;so check if the desktop has focus after switching to a new one. if it does send an alt + tab to focus the window on that desktop
+		If(this._doesDesktopHaveFocus() && ! isMultiTaskingViewActive())
 		{
 			send !{tab}
 		}
 		return this
+	}
+	
+	_doesDesktopHaveFocus() 
+	{
+		;CabinetWClass is file explorer
+		return WinActive("ahk_exe explorer.exe") && ! WinActive("ahk_class CabinetWClass")
 	}
 }
