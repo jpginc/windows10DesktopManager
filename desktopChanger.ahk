@@ -7,7 +7,9 @@ class JPGIncDesktopChangerClass
 	
 	__new() 
 	{
+		this.DllWindowMover := new JPGIncDllWindowMover()
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
+		Gui, destkopChanginGUI: new,
 		return this
 	}
 
@@ -49,17 +51,29 @@ class JPGIncDesktopChangerClass
 
 	_goToDesktop(newDesktopNumber)
 	{
-		currentDesktop := this.desktopMapper.getDesktopNumber()
-		direction := currentDesktop - newDesktopNumber
-		distance := Abs(direction)
-		debugger("distance to move is " distance "`ndirectin" direction)
-		if(direction < 0)
+		if(this.DllWindowMover.isAvailable())
 		{
-			debugger("Sending right! " distance "times")
-			send("^#{right " distance "}")
-		} else
+			Gui destkopChanginGUI: show, W0 H0
+			Gui destkopChanginGUI: +HwnddesktopChangingGuiHwnd
+			this.DllWindowMover.moveWindowToDesktop(newDesktopNumber, desktopChangingGuiHwnd)
+			;doing 2 win shows doesn't appear to change desktops
+			WinActivate, ahk_class Shell_TrayWnd
+			Gui destkopChanginGUI: show, W0 H0
+			Gui destkopChanginGUI: hide,
+		} else 
 		{
-			send("^#{left " distance "}")
+			currentDesktop := this.desktopMapper.getDesktopNumber()
+			direction := currentDesktop - newDesktopNumber
+			distance := Abs(direction)
+			debugger("distance to move is " distance "`ndirectin" direction)
+			if(direction < 0)
+			{
+				debugger("Sending right! " distance "times")
+				send("^#{right " distance "}")
+			} else
+			{
+				send("^#{left " distance "}")
+			}
 		}
 		return this
 	}
