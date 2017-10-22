@@ -1,4 +1,7 @@
 #SingleInstance
+
+Menu, Tray, icon, %A_ScriptDir%\virtualDesktopManager.ico, 1
+
 if(! A_IsAdmin)
 {
     ;dll calls window movers will not work without admin
