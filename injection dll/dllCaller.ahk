@@ -1,4 +1,7 @@
 ﻿SetWorkingDir, % A_ScriptDir
+#NoTrayIcon
+#Persistent
+#SingleInstance, force
 parentPID = %1%
 32Or64 = %2%
 libraryFileName := "hook " 32Or64 ".dll"
@@ -11,8 +14,8 @@ libraryHandle := loadDllOrDie(libraryFileName)
 moveDesktopHookHandle := getHookHandleOrDie(libraryHandle)
 ;hook up the move desktop callback on WH_GETMESSAGE messages
 setupMoveDesktopCallback(moveDesktopHookHandle, libraryHandle)
-waitForParentToClose(parentPID)
-ExitApp
+;waitForParentToClose(parentPID)
+Exit ;App
 
 setupMoveDesktopCallback(functionHandle, libraryHandle)
 {
