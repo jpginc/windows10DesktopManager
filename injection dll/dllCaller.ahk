@@ -1,13 +1,14 @@
 ﻿SetWorkingDir, % A_ScriptDir
 #NoTrayIcon
 #Persistent
-#SingleInstance, force
+#SingleInstance, off
+
 parentPID = %1%
 32Or64 = %2%
 libraryFileName := "hook " 32Or64 ".dll"
 
 validateArgsOrDie(parentPID, 32Or64)
-
+ensureSingleInstancePropertyOrDie(32Or64)
 ;load the custom dll
 libraryHandle := loadDllOrDie(libraryFileName)
 ;get the address of the move desktop callback
@@ -69,6 +70,39 @@ waitForParentToClose(parentPID)
 	return
 }
 
+ensureSingleInstancePropertyOrDie(32Or64) {
+	pidFileName := A_ScriptDir "/.pid" 32Or64
+	
+	unableToCloseProcess := "Unable to close process with PID "
+	unableToReadPidFile := "Unable to read " pidFileName " file"
+	unableToDeletePidFile := "Unable to delete " pidFileName " file"
+	unableToCreatePidFile := "Unable to create " pidFileName " file"
+	
+	if (FileExist(pidFileName)) {
+		FileRead, pid, %pidFileName%
+		if (ErrorLevel != 0) {
+			alertErrorAndDie(unableToReadPidFile . pid)
+		}
+		
+		Process, Exist, %pid%
+		if (ErrorLevel == pid) {
+			Process, Close, %pid%
+			if (ErrorLevel == 0) {
+				alertErrorAndDie(unableToCloseProcess . pid)
+			}
+		}
+		
+		FileDelete, %pidFileName%
+		if (ErrorLevel == 1) {
+			alertErrorAndDie(unableToDeletePidFile)
+		}
+	}
+	
+	FileAppend, % DllCall("GetCurrentProcessId"), %pidFileName%
+	if (ErrorLevel == 1) {
+		alertErrorAndDie(unableToCreatePidFile)
+	}
+}
 validateArgsOrDie(parentPID, 32Or64)
 {
 	invalidCommandLineArgs := "Invalid command line args`nneed a process id and the string '64' or '32'"
