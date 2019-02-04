@@ -75,7 +75,7 @@ callFunction(possibleFunction)
 
 getDesktopNumberFromHotkey(keyCombo)
 {
-	number := RegExReplace(keyCombo, "[^\d]", "")
+	number := RegExReplace(keyCombo, "(F\d+|[^\d])", "")
 	return number == 0 ? 10 : number
 }
 
