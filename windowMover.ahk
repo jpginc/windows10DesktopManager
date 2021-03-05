@@ -11,6 +11,7 @@
 		this.dllWindowMover := new JPGIncDllWindowMover()
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
 		this.monitorMapper := new MonitorMapperClass()
+		this._desktopChanger := new JPGIncDesktopChangerClass()
 		return this
 	}
 	
@@ -42,7 +43,7 @@
 			closeMultitaskingViewFrame()
 		}
 		
-		this._followWindow(activeHwnd)
+		this._followWindow(targetDesktop)
 			.doPostMoveWindow()
 		
 		return	this
@@ -78,20 +79,12 @@
 		return targetDesktop
 	}
 	
-	_followWindow(hwnd)
+	_followWindow(targetDesktop)
 	{
 		if(this.followToNewDesktop)
 		{
-			this._deActivateActiveWindow()
-			WinActivate, % "ahk_id " hwnd
+			this._desktopChanger.goToDesktop(targetDesktop)
 		}
 		return this
-	}
-	
-	_deActivateActiveWindow()
-	{
-		Gui, new
-		Gui, Show
-		Gui, destroy
 	}
 }
