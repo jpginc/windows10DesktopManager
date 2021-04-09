@@ -36,6 +36,18 @@
 		return this
 	}
 	
+	setSaveAllWindows(hotkeyKey)
+	{
+		this.hotkeyManager.setupHotkey(this._DockWin, this._DockWin.SaveAllWindowsFunctionName, hotkeyKey)
+		return this
+	}
+    
+	setLoadAllWindows(hotkeyKey)
+	{
+		this.hotkeyManager.setupHotkey(this._DockWin, this._DockWin.LoadAllWindowsFunctionName, hotkeyKey)
+		return this
+	}
+	
 	setMoveWindowToNextDesktop(hotkeyKey)
 	{
 		this.hotkeyManager.setupHotkey(this._windowMover, this._windowMover.moveToNextFunctionName, hotkeyKey)

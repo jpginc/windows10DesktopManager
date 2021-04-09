@@ -21,9 +21,12 @@ globalDesktopManager.setGoToDesktop("Capslock")
     .setGoToPreviousDesktop("Capslock & q")
     .setMoveWindowToNextDesktop("Capslock & s")
     .setMoveWindowToPreviousDesktop("Capslock & a")
+    .setSaveAllWindows("Capslock & 0")
+    .setLoadAllWindows("Capslock & 9")
     ;~ .followToDesktopAfterMovingWindow(true)
 	;~ .setCloseDesktop("Capslock & x")
 	;~ .setNewDesktop("Capslock & n")
+	
 
 return
 
@@ -38,3 +41,4 @@ return
 #Include hotkeyManager.ahk
 #Include commonFunctions.ahk
 #Include dllWindowMover.ahk
+#Include DockWin.ahk
