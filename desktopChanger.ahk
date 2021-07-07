@@ -10,30 +10,32 @@ class JPGIncDesktopChangerClass
 		this.DllWindowMover := new JPGIncDllWindowMover()
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
 		Gui, destkopChanginGUI: new,
+		Gui, destkopChanginGUI: -caption,
+		Gui, destkopChanginGUI: -SysMenu,
 		return this
 	}
 
 	goToNextDesktop(keyCombo := "")
 	{
 		send("^#{right}")
-		return this.doPostGoToDesktop()
+		return this.doPostGoToDesktop(true)
 	}
 	
 	goToPreviousDesktop(keyCombo := "")
 	{
 		send("^#{left}")
-		return this.doPostGoToDesktop()
+		return this.doPostGoToDesktop(true)
 	}
 	
 	/*
 	 *	swap to the given virtual desktop number
 	 */
-	goToDesktop(newDesktopNumber) 
+	goToDesktop(newDesktopNumber, activateWindow := true) 
 	{
 		debugger("in go to desktop changing to " newDesktopNumber)
 		this._makeDesktopsIfRequired(newDesktopNumber)
 			._goToDesktop(newDesktopNumber)
-		this.doPostGoToDesktop()
+		this.doPostGoToDesktop(activateWindow)
 		return this
 	}
 	
@@ -50,6 +52,11 @@ class JPGIncDesktopChangerClass
 
 	_goToDesktop(newDesktopNumber)
 	{
+		; Fixes the issue of active windows in intermediate desktops capturing the switch shortcut and therefore delaying or 
+		; stopping the switching sequence. This also fixes the flashing window button after switching in the taskbar. 
+		; More info: https://github.com/pmb6tz/windows-desktop-switcher/pull/19
+		WinActivate, ahk_class Shell_TrayWnd
+
 		if(this.DllWindowMover.isAvailable())
 		{
 			Gui destkopChanginGUI: show, W0 H0
@@ -77,9 +84,12 @@ class JPGIncDesktopChangerClass
 		return this
 	}
 	
-	doPostGoToDesktop() 
+	doPostGoToDesktop(activateWindow) 
 	{
-		this._activateTopMostWindow()
+		if(activateWindow)
+		{
+			this._activateTopMostWindow()
+		}
 		callFunction(this.postGoToDesktopFunctionName)
 		return this
 	}
@@ -98,6 +108,6 @@ class JPGIncDesktopChangerClass
 	_doesDesktopHaveFocus() 
 	{
 		;CabinetWClass is file explorer
-		return WinActive("ahk_exe explorer.exe") && ! WinActive("ahk_class CabinetWClass")
+		return WinActive("ahk_exe explorer.exe") && ! WinActive("ahk_class CabinetWClass") 
 	}
 }

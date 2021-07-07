@@ -102,6 +102,8 @@ class DesktopMapperClass
 	_setupGui()
 	{
 		Gui, new
+		Gui, -caption 
+		Gui, -SysMenu 
 		Gui, show
 		Gui, +HwndMyGuiHwnd
 		this.hwnd := MyGuiHwnd
