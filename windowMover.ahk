@@ -12,9 +12,6 @@
 		this.desktopMapper := new DesktopMapperClass(new VirtualDesktopManagerClass())
 		this.monitorMapper := new MonitorMapperClass()
 		this._desktopChanger := new JPGIncDesktopChangerClass()
-		Gui, asdf: new,
-		Gui, asdf: -caption 
-		Gui, asdf: -SysMenu 
 		return this
 	}
 	
@@ -26,6 +23,10 @@
 	
 	moveActiveWindowToDesktop(targetDesktop, follow := false)
 	{
+		if(targetDesktop < 1) 
+		{
+			return this
+		}
 		activeHwnd := WinExist("A")
 		currentDesktop := this.desktopMapper.getDesktopNumber()
 
@@ -42,6 +43,7 @@
 		{
 			winhide,  % "ahk_id " activeHwnd
 			this._desktopChanger.goToDesktop(targetDesktop)
+			WinActivate, ahk_class Shell_TrayWnd
 			sleep 50
 			winshow,  % "ahk_id " activeHwnd
 			if(! this.followToNewDesktop) 
@@ -71,25 +73,9 @@
 	
 	_reactivateWindow(activeHwnd)
 	{
-		Gui asdf: show, 
-		WinActivate, A
+		WinActivate, ahk_class Shell_TrayWnd
 		sleep 50
 		WinActivate,  % "ahk_id " activeHwnd
-		Gui asdf: hide	
 		return this
-	}
-	
-	getNumberOfDownsNeededToSelectDesktop(targetDesktop, currentDesktop)
-	{
-		; This part figures out how many times we need to push down within the context menu to get the desktop we want.	
-		if (targetDesktop > currentDesktop)
-		{
-			targetDesktop -= 2
-		}
-		else
-		{
-			targetdesktop--
-		}
-		return targetDesktop
 	}
 }

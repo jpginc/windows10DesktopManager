@@ -29,6 +29,7 @@ return
 
 #c::ExitApp
 
+#Include helpers.ahk
 #Include desktopManager.ahk
 #Include desktopChanger.ahk
 #Include windowMover.ahk

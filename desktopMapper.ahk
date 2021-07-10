@@ -38,16 +38,24 @@ class DesktopMapperClass
 	 */
 	getCurrentDesktopId()
 	{
-		hwnd := this.hwnd
-		Gui %hwnd%:show, NA ;show but don't activate
-		winwait, % "Ahk_id " hwnd
-		
-		guid := this.virtualDesktopManager.getDesktopGuid(hwnd)
-
-		Gui %hwnd%:hide 
-		;if you don't wait until it closes (and sleep a little) then the desktop the gui is on can get focus
-		WinWaitClose,  % "Ahk_id " hwnd
-		sleep 50 
+		hideGui := false
+		windowID := activeWindowOnCurrentDesktop()
+		if(! windowID)
+		{
+			hideGui := true
+			windowID := this.hwnd
+			Gui %windowID%:show, NA ;show but don't activate
+			winwait, % "Ahk_id " windowID
+		}
+			
+		guid := this.virtualDesktopManager.getDesktopGuid(windowID)
+		if(hideGui) 
+		{
+			Gui %windowID%:hide 
+			;if you don't wait until it closes (and sleep a little) then the desktop the gui is on can get focus
+			WinWaitClose,  % "Ahk_id " windowID
+			sleep 50 
+		}
 
 		return this._idFromGuid(guid)
 	}
